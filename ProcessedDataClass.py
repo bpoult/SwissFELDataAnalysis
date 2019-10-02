@@ -13,7 +13,22 @@ class XASProData:
     ,"DataFluo_pump_total",\
     "DataFluo_unpump_total",\
     "IzeroMedian","IzeroSTD",\
-    "Energy"
+    "Energy", "delays"
+        
+        
+    _default_value = None
+    
+    def __init__(self, **kwargs):
+
+        self.__dict__.update(dict.fromkeys(self._defaults, self._default_value))
+        self.__dict__.update(kwargs)
+        
+    def changeValue(self, **kwargs):
+        self.__dict__.update(kwargs)
+        
+class RIXSProData:
+    _defaults = "","RIXS_map_unpumped",\
+    "Emission_vs_Time_pumped", "mission_vs_Time_unpumped"
         
         
     _default_value = None

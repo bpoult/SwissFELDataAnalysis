@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Oct  1 19:47:10 2019
+
+@author: ext-poulter_b
+"""
+
 import sys
 sys.path.insert(0, '/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/jfut/')
 import jungfrau_utils as jf
@@ -16,9 +24,9 @@ import pickle
 
 
 # Set the scan name and the directories of the scan and its json file
-scan_name = "RuDimerACN_monoscan_10ps_004"
+scan_name = "jet_timing_039"
 
-saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/TFY/10ps/" + scan_name + "/"
+saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuBpy3/Kinetic_Traces/" + scan_name + "/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
 
@@ -33,6 +41,16 @@ elif exists:
     with open(saveDir + "xasrawdata.pkl", "rb") as f:
         xasrawdata = pickle.load(f)
 
+delay_mm = np.empty(0)
+for i in range(0,len(xasrawdata.delay_SH_pump)):
+    delay = [x for x in xasrawdata.delay_SH_pump[i] if x>0]
+    delay_mm = np.append(delay_mm, np.mean(delay[i]))
+
+time_zero_mm = 156.3276
+delay_ps = 1e12*(delay_mm - time_zero_mm)*2*1e-3/(3e8)
+
+delays = np.array(delay_ps)
+
 
 saveProData = True
 loadProData = False
@@ -40,13 +58,18 @@ loadProData = False
 xasprodata = FilterData(xasrawdata,True)
 
 plt.figure()
-plt.plot(xasprodata.Energy, xasprodata.DataFluo_pump_norm_total,label='Pumped')
-plt.plot(xasprodata.Energy, xasprodata.DataFluo_unpump_norm_total,label='UnPumped')
-plt.xlabel('energy (eV)')
+plt.plot(delays, xasprodata.DataFluo_pump_norm_total,label='Pumped')
+plt.plot(delays, xasprodata.DataFluo_unpump_norm_total,label='UnPumped')
+plt.xlabel('Time (ps)')
 plt.ylabel('absorption')
-plt.title('XAS_'+ scan_name)
+plt.title(scan_name)
 plt.legend()
 
+#plt.figure()
+#plt.plot(delays, xasprodata.DataFluo_unpump_norm_total-xasprodata.DataFluo_pump_norm_total,label='UnPump-Pump')
+
+
+xasprodata.changeValue(delays=delays)
 
 if saveProData is True:
         with open(saveDir + "xasprodata.pkl", "wb") as f:

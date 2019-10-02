@@ -10,15 +10,15 @@ from matplotlib import pyplot as plt
 import ProcessedDataClass as PDC 
     
 XASProData = PDC.XASProData()
-    
+numstds = 2.8
+minIzero = 0.022
+lin_filter = 0.08
+
 def FilterData(xasrawdata,PlotOn):
 
 # numstds is the number of standard deviations to take from the median
 # minIzero sets the minimum permissable Izero
 # lin_filter sets upper and lower bounds for the filter
-    numstds = 3
-    minIzero = 0.025
-    lin_filter = 0.1
 
 
     DataFluo_pump_norm_total = np.empty(0)
@@ -61,6 +61,9 @@ def FilterData(xasrawdata,PlotOn):
         conditionUnPumpLinHigh =  DataFluo_unpump < IzeroFEL_unpump*linFit_unpump[0]+linFit_unpump[1]+lin_filter
         conditionUnPumpLinLow =  DataFluo_unpump > IzeroFEL_unpump*linFit_unpump[0]+linFit_unpump[1]-lin_filter
         
+        condLin_pump =  conditionPumpLinHigh & conditionPumpLinLow
+        condLin_unpump =  conditionUnPumpLinHigh & conditionUnPumpLinLow
+
         IzeroMedian+numstds*IzeroSTD
         
         conditionPumpMax = IzeroFEL_pump < IzeroMedian+numstds*IzeroSTD
@@ -98,7 +101,8 @@ def FilterData(xasrawdata,PlotOn):
         iZero = np.append(iZero, np.mean(IzeroFEL_pump_total))
         
         
-        
+        condFinalPump = condLin_pump & condIzeroPump
+        condFinalUnPump = condLin_unpump & condIzeroUnPump
         
         if i == 25 and PlotOn:   # feel free to elmnate this if statement and following line
             
@@ -113,6 +117,9 @@ def FilterData(xasrawdata,PlotOn):
                            DataFluo_unpump_total=DataFluo_unpump_total,DataFluo_unpump_norm_total=DataFluo_unpump_norm_total\
                            ,IzeroMedian=IzeroMedian, IzeroSTD=IzeroSTD, Energy = Energy)
     
+
+        
+        
     print("The original number of pumped and unpumped shots is:")
     print(len(xasrawdata.Izero_pump_total[1])*len(xasrawdata.Izero_pump_total),\
           + len(xasrawdata.Izero_unpump_total[1])*len(xasrawdata.Izero_unpump_total))
@@ -150,12 +157,44 @@ def FilterData(xasrawdata,PlotOn):
     return XASProData
 
 
+def FilteringStuff(i,xasrawdata):
+    
+    IzeroMedian = xasrawdata.IzeroMedian
+    IzeroSTD = xasrawdata.IzeroSTD
+    DataFluo_pump = xasrawdata.DataFluo_pump_total[i]
+    DataFluo_unpump = xasrawdata.DataFluo_unpump_total[i]
+    IzeroFEL_pump = xasrawdata.Izero_pump_total[i]
+    IzeroFEL_unpump = xasrawdata.Izero_unpump_total[i]
+    
+    linFit_pump = np.polyfit(IzeroFEL_pump,DataFluo_pump,1)
+    linFit_unpump = np.polyfit(IzeroFEL_unpump,DataFluo_unpump,1)
+        
+    conditionPumpLinHigh =  DataFluo_pump < IzeroFEL_pump*linFit_pump[0]+linFit_pump[1]+lin_filter
+    conditionPumpLinLow =  DataFluo_pump > IzeroFEL_pump*linFit_pump[0]+linFit_pump[1]-lin_filter
+        
+    conditionUnPumpLinHigh =  DataFluo_unpump < IzeroFEL_unpump*linFit_unpump[0]+linFit_unpump[1]+lin_filter
+    conditionUnPumpLinLow =  DataFluo_unpump > IzeroFEL_unpump*linFit_unpump[0]+linFit_unpump[1]-lin_filter
+        
+    condLin_pump =  conditionPumpLinHigh & conditionPumpLinLow
+    condLin_unpump =  conditionUnPumpLinHigh & conditionUnPumpLinLow
 
+    IzeroMedian+numstds*IzeroSTD
+        
+    conditionPumpMax = IzeroFEL_pump < IzeroMedian+numstds*IzeroSTD
+    conditionPumpMin = IzeroFEL_pump > IzeroMedian-numstds*IzeroSTD
+    conditionPumpLow = IzeroFEL_pump > minIzero
 
+    conditionUnPumpMax = IzeroFEL_unpump < IzeroMedian+numstds*IzeroSTD
+    conditionUnPumpMin = IzeroFEL_unpump > IzeroMedian-numstds*IzeroSTD
+    conditionUnPumpLow = IzeroFEL_unpump > minIzero
 
+    condIzeroPump = conditionPumpMax & conditionPumpMin & conditionPumpLow & conditionPumpLinHigh & conditionPumpLinLow
+    condIzeroUnPump = conditionUnPumpMax & conditionUnPumpMin & conditionUnPumpLow & conditionUnPumpLinHigh & conditionUnPumpLinLow
+            
+    condFinalPump = condLin_pump & condIzeroPump
+    condFinalUnPump = condLin_unpump & condIzeroUnPump
 
-
-
+    return condFinalPump,condFinalUnPump
 
 
 
