@@ -75,7 +75,7 @@ def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
 
     
     print(images_thr_on.shape)
-    print(images_thr_on.shape)
+    print(images_thr_off.shape)
     
     images_thr_on = images_thr_on[condFinalPump]
     images_thr_off = images_thr_off[condFinalUnPump]

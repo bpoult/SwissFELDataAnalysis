@@ -10,8 +10,8 @@ from matplotlib import pyplot as plt
 import ProcessedDataClass as PDC 
     
 XASProData = PDC.XASProData()
-numstds = 2.8
-minIzero = 0.022
+numstds = 3.5
+minIzero = 0.017
 lin_filter = 0.08
 
 def FilterData(xasrawdata,PlotOn):

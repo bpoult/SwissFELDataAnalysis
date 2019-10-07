@@ -24,7 +24,7 @@ from GetXES import get_xes_pumped
 import ProcessedDataClass as PDC 
 
 rixsprodata = PDC.RIXSProData()
-scannum = [2]
+scannum = [18]
 name = "RuDimerACN_monoscan_10ps_0"
 scan = "RuDimerACN_monoscan_10ps_0"+ '%02d' % scannum[0]
 loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/TFY/10ps/" + scan + "/"
@@ -77,17 +77,29 @@ if not exists:
 elif exists:
     with open(saveDir + "rixsprodata.pkl", "rb") as f:
         rixsprodata = pickle.load(f)
-        
-X,Y = np.meshgrid(np.linspace(0,RIXS_on_01.shape[1],RIXS_on_01.shape[1]+1),xasrawdata.Energy)
-plt.figure()
+
+RIXSpumped = np.asarray(rixsprodata.RIXS_map_pumped, dtype=np.float32)
+RIXSunpumped = np.asarray(rixsprodata.RIXS_map_unpumped, dtype=np.float32)
+
+
+X,Y = np.meshgrid(np.linspace(0,RIXSpumped.shape[1],RIXSpumped.shape[1]+1),xasrawdata.Energy)
 plt.subplot(2,1,1)
-plt.pcolor(X,Y,RIXS_on_01, vmax = 0.1)
+plt.pcolor(X,Y,rixsprodata.RIXS_map_pumped, vmax = 0.1)
 plt.colorbar()
 plt.xlabel('JF pixel')
 plt.ylabel('Mono Energy (eV)')
 plt.title('scannum ' + str(scannum) + ' on')
 plt.tight_layout()
 
+X,Y = np.meshgrid(np.linspace(0,RIXSunpumped.shape[1],RIXSunpumped.shape[1]+1),xasrawdata.Energy)
+plt.figure()
+plt.subplot(2,1,1)
+plt.pcolor(X,Y,rixsprodata.RIXS_map_unpumped, vmax = 0.1)
+plt.colorbar()
+plt.xlabel('JF pixel')
+plt.ylabel('Mono Energy (eV)')
+plt.title('scannum ' + str(scannum) + ' off')
+plt.tight_layout()
 
 #plt.figure()
 #x = np.linspace(0,RIXS_on_01.shape[1],RIXS_on_01.shape[1])
