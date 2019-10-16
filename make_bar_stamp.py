@@ -13,11 +13,11 @@ def make_bar_stamp(dimension_x, dimension_y):
 
     Z = np.zeros([dimension_y,dimension_x])+1
 
-    condition = np.logical_and(Y<260, Y>253)
+    condition = np.logical_and(Y<260, Y>260)
     Z[condition] = 0
     
     Z[Y>320] = 0
-    Z[Y < 200] = 0
+    Z[Y < 180] = 0
 
     condition = np.logical_not(np.logical_and(X<200, X>130))
     Z[condition] = 0

@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Wed Oct 16 02:01:24 2019
+
+@author: ext-poulter_b
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Tue Oct  1 23:52:59 2019
 
 @author: ext-poulter_b
@@ -24,18 +32,20 @@ from GetXES import get_xes_pumped
 import ProcessedDataClass as PDC 
 
 rixsprodata = PDC.RIXSProData()
-scannum = [1]
-name = "RuDimerCl_monoscan_0"
-scan = "RuDimerCl_monoscan_0"+ '%02d' % scannum[0]
-loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces" + scan + "/"
-saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces/Emission" + scan + "/"
+scannum = [11]
+name = "RuDimerACN_timescan_0"
+scan = "RuDimerACN_timescan_0"+ '%02d' % scannum[0]
+loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces/" + scan + "/"
+saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces/Emission/ " + scan + "/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
     
 with open(loadDir + "xasrawdata.pkl", "rb") as f:
     xasrawdata = pickle.load(f)
+with open(loadDir + "xasprodata.pkl", "rb") as f:
+    xasprodata = pickle.load(f)
 
-exists = os.path.isfile(saveDir + 'rixsprodata.pkl')
+exists = os.path.isfile(saveDir + 'XES_kinetic.pkl')
 if not exists:
 
     for jj in range(len(scannum)):
@@ -72,33 +82,45 @@ if not exists:
     save = True
     if save is True:
         rixsprodata.changeValue(RIXS_map_pumped=RIXS_on_01, RIXS_map_unpumped = RIXS_off_01)
-        with open(saveDir + "rixsprodata.pkl", "wb") as f:
+        with open(saveDir + "XES_kinetic.pkl", "wb") as f:
             pickle.dump(rixsprodata, f)
 elif exists:
-    with open(saveDir + "rixsprodata.pkl", "rb") as f:
+    with open(saveDir + "XES_kinetic.pkl", "rb") as f:
         rixsprodata = pickle.load(f)
 
 RIXSpumped = np.asarray(rixsprodata.RIXS_map_pumped, dtype=np.float32)
 RIXSunpumped = np.asarray(rixsprodata.RIXS_map_unpumped, dtype=np.float32)
 
-X,Y = np.meshgrid(np.linspace(0,RIXSpumped.shape[1],RIXSpumped.shape[1]+1),xasrawdata.Energy)
+X,Y = np.meshgrid(np.linspace(0,RIXSpumped.shape[1],RIXSpumped.shape[1]+1),xasprodata.delays)
 plt.subplot(2,1,1)
 plt.pcolor(X,Y,rixsprodata.RIXS_map_pumped, vmax = 0.1)
 plt.colorbar()
 plt.xlabel('JF pixel')
-plt.ylabel('Mono Energy (eV)')
+plt.ylabel('Time (ps)')
 plt.title('scannum ' + str(scannum) + ' on')
 plt.tight_layout()
 
-X,Y = np.meshgrid(np.linspace(0,RIXSunpumped.shape[1],RIXSunpumped.shape[1]+1),xasrawdata.Energy)
+X,Y = np.meshgrid(np.linspace(0,RIXSunpumped.shape[1],RIXSunpumped.shape[1]+1),xasprodata.delays)
 plt.figure()
 plt.subplot(2,1,1)
 plt.pcolor(X,Y,rixsprodata.RIXS_map_unpumped, vmax = 0.1)
 plt.colorbar()
 plt.xlabel('JF pixel')
-plt.ylabel('Mono Energy (eV)')
+plt.ylabel('Time (ps)')
 plt.title('scannum ' + str(scannum) + ' off')
 plt.tight_layout()
+
+X,Y = np.meshgrid(np.linspace(0,RIXSunpumped.shape[1],RIXSunpumped.shape[1]+1),xasprodata.delays)
+plt.figure()
+plt.subplot(2,1,1)
+plt.pcolor(X,Y,rixsprodata.RIXS_map_pumped-rixsprodata.RIXS_map_unpumped, vmax = 0.05)
+plt.colorbar()
+plt.xlabel('JF pixel')
+plt.ylabel('Time (ps)')
+plt.title('scannum ' + str(scannum) + ' off')
+plt.tight_layout()
+
+
 
 #plt.figure()
 #x = np.linspace(0,RIXS_on_01.shape[1],RIXS_on_01.shape[1])

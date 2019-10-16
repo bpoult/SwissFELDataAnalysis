@@ -36,7 +36,7 @@ def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
     # change the second number to: 50/2 for 1 shot on 1 shot off
     #                            : 50/3 for 2 shots on 1 shot off
     images_off, images_on, pulse_ids_off, pulse_ids_on = \
-        load_JF_cropped_data_pump(DIR + filename + ".JF02T09V02crop.h5", roi, 50, 50/3, nshots=None)
+        load_JF_cropped_data_pump(DIR + filename + ".JF02T09V02crop.h5", roi, 50, 50/2, nshots=None)
         
     
 #    _, _, _, _, JFIDs_pump, JFIDs_unpump, _, _ =load_PumpProbe_events(filename,channel_JF_pulse_ids)
@@ -55,8 +55,14 @@ def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
     print(images_on.shape[0])
     print(images_off.shape[0])
 
+    
+    condFinalPump, condFinalUnPump = FilteringStuff(ii,xasrawdata)
+
     images_good_on = images_on
     images_good_off = images_off
+
+    images_good_on = images_good_on[condFinalPump]
+    images_good_off = images_good_off[condFinalUnPump]
 
     images_thr_on = images_good_on.copy()
     images_thr_on[images_good_on < image_threshold] = 0
@@ -68,17 +74,11 @@ def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
     images_thr_off[images_good_off > hot_pixel] = 0
     images_thr_off[np.isnan(images_thr_off)] = 0
     
-    print('num nan')
-    print(sum(sum(sum(np.isnan(images_thr_on)))))
-    
-    condFinalPump, condFinalUnPump = FilteringStuff(ii,xasrawdata)
-
-    
     print(images_thr_on.shape)
     print(images_thr_off.shape)
     
-    images_thr_on = images_thr_on[condFinalPump]
-    images_thr_off = images_thr_off[condFinalUnPump]
+    print('num nan')
+    print(sum(sum(sum(np.isnan(images_thr_on)))))
 
     print('number of surviving frames')
     print(images_thr_on.shape[0])
