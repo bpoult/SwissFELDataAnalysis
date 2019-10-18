@@ -24,13 +24,11 @@ from GetXES import get_xes_pumped
 import ProcessedDataClass as PDC 
 
 rixsprodata = PDC.RIXSProData()
-print('What are the lower and upper bounds of the XES scans?')
-scannum_low = int(input())
-scannum_high = int(input())
-scannum = range(scannum_low,scannum_high)
-name = "XES_2842.0eV_600fs"
-loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/600fs/" + name + "/"
-saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/600fs/" + name + "/"
+scannum = [1]
+name = "RuDimerCl_monoscan_0"
+scan = "RuDimerCl_monoscan_0"+ '%02d' % scannum[0]
+loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces" + scan + "/"
+saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces/Emission" + scan + "/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
     
@@ -41,16 +39,15 @@ exists = os.path.isfile(saveDir + 'rixsprodata.pkl')
 if not exists:
 
     for jj in range(len(scannum)):
-        scan_name = 'run_000' + '%02d' % scannum[jj]
-        DIR = '/das/work/p17/p17983/cropped_data/' + name + "/"
-        DIRBS = "/sf/alvra/data/p17983/raw/" + name + "/"
+        filename_base = name + '%02d' % scannum[jj] + "_step00"
+        scan_name = name + '%02d' % scannum[jj]
+        DIR = '/das/work/p17/p17983/cropped_data/scan_data/' + scan_name + "/"
+        DIRBS = "/sf/alvra/data/p17983/raw/scan_data/" + scan_name + "/"
         numsteps = len(xasrawdata.Energy)
 
         for ii in range(numsteps):
-            filename_base = 'run_000' + '%02d' % scannum[ii]
-
             XES_on, XES_off = \
-                get_xes_pumped(filename_base,xasrawdata,DIR, DIRBS,2,True,ii)
+                get_xes_pumped(filename_base + '%02d' % (ii+0),xasrawdata,DIR, DIRBS,2,True,ii)
             
 
             if ii == 0 & jj == 0:

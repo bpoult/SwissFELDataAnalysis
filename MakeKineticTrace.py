@@ -24,9 +24,9 @@ import pickle
 
 
 # Set the scan name and the directories of the scan and its json file
-scan_name = "RuDimerACN_timescan_011"
+scan_name = "RuDimerCl_timescan_009"
 
-saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces/" + scan_name + "/"
+saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerCl/Kinetic_Traces/" + scan_name + "/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
 

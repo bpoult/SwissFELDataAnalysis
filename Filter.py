@@ -10,10 +10,9 @@ from matplotlib import pyplot as plt
 import ProcessedDataClass as PDC 
     
 XASProData = PDC.XASProData()
-numstds = 3
+numstds = 3.5
 minIzero = 0.025
-lin_filter = 0.075
-
+lin_filter = 0.07
 def FilterData(xasrawdata,PlotOn):
 
 # numstds is the number of standard deviations to take from the median
@@ -101,9 +100,6 @@ def FilterData(xasrawdata,PlotOn):
         iZero = np.append(iZero, np.mean(IzeroFEL_pump_total))
         
         
-        condFinalPump = condLin_pump & condIzeroPump
-        condFinalUnPump = condLin_unpump & condIzeroUnPump
-        
         if i == 25 and PlotOn:   # feel free to elmnate this if statement and following line
             
             plt.scatter(IzeroFEL_pump, DataFluo_pump)
@@ -115,7 +111,8 @@ def FilterData(xasrawdata,PlotOn):
     XASProData.changeValue(Izero_pump_total=IzeroFEL_pump_total,Izero_unpump_total=IzeroFEL_unpump_total\
                            ,DataFluo_pump_total=DataFluo_pump_total,DataFluo_pump_norm_total=DataFluo_pump_norm_total, \
                            DataFluo_unpump_total=DataFluo_unpump_total,DataFluo_unpump_norm_total=DataFluo_unpump_norm_total\
-                           ,IzeroMedian=IzeroMedian, IzeroSTD=IzeroSTD, Energy = Energy)
+                           ,IzeroMedian=IzeroMedian, IzeroSTD=IzeroSTD, Energy = Energy\
+                           ,error_unpump = err_DataFluo_unpump_total, error_pump = err_DataFluo_pump_total)
     
 
         
@@ -142,14 +139,14 @@ def FilterData(xasrawdata,PlotOn):
         
         plt.figure()
         plt.scatter(IzeroFEL_pump_raw_total, DataFluo_pump_raw_total)
-        plt.scatter(IzeroFEL_pump_total, DataFluo_pump_total)
+        plt.scatter(IzeroFEL_pump_total, DataFluo_pump_total,alpha=0.05)
         plt.title('Izero, pumped')
         plt.xlabel('I0')
         plt.ylabel('Absorption')
 
         plt.figure()
         plt.scatter(IzeroFEL_unpump_raw_total, DataFluo_unpump_raw_total)
-        plt.scatter(IzeroFEL_unpump_total, DataFluo_unpump_total)
+        plt.scatter(IzeroFEL_unpump_total, DataFluo_unpump_total,alpha=0.05)
         plt.title('Izero, unpumped')
         plt.xlabel('I0')
         plt.ylabel('Absorption')

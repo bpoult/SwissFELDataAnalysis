@@ -10,7 +10,7 @@ from alvra_tools.load_data import *
 from alvra_tools.channels import *
 from load_PumpProbe_events_BIP import load_PumpProbe_events_BIP
 
-def LoadData(scan_name,XAS):
+def LoadData(scan_name,XAS,XES):
     
     import sys
     sys.path.insert(0, '/das/work/p17/p17983/')
@@ -23,19 +23,28 @@ def LoadData(scan_name,XAS):
     
 
     
-    
-    DIR = "/sf/alvra/data/p17983/raw/scan_data/" + scan_name + "/"
+    if XAS:
+        DIR = "/sf/alvra/data/p17983/raw/scan_data/" + scan_name + "/"
+    if XES:
+        DIR = "/sf/alvra/data/p17983/raw/" + scan_name + "/"
     DIR_json = "/sf/alvra/data/p17983/res/scan_info/"
     
-    if XAS:
-        xasRawData = RDC.XASRawData()
-    
+    xasRawData = RDC.XASRawData()
+    print(DIR)
     json_file = DIR_json + scan_name + "_scan_info.json"
     print (json_file)
-
-    with open(json_file) as file:
-        data = json.load(file)
-    numFiles = len(data['scan_files'])
+    if XAS is True:
+        with open(json_file) as file:
+            data = json.load(file)
+            numFiles = len(data['scan_files'])
+            looprange = range(0,numFiles)
+    if XES is True:
+        print("Lower File number bound? (XES)")
+        num_XES_lower = int(input())
+        print("Upper File number bound? (XES)")
+        num_XES_upper = int(input())
+        numFiles = num_XES_upper - num_XES_lower
+        looprange = range(num_XES_lower,num_XES_upper)
     print ("Processing",numFiles,"files")
     
     IzeroFEL_pump_original_total = []
@@ -65,11 +74,15 @@ def LoadData(scan_name,XAS):
     DataFluo_pump_original_total = []
     DataFluo_unpump_original_total = []
     Energy_eV = np.empty(0)
-    waeplate_total = np.empty(0)
+    waveplate_total = np.empty(0)
     
-    for i in range(0,numFiles):
+    for i in looprange:
 #for i in range(0,1):
-        filename = str(data['scan_files'][i][0])
+        if XAS is True:
+            filename = str(data['scan_files'][i][0])
+        if XES is True:
+            filename = 'run_000' + '%02d' %i +'.BSREAD.h5'
+            print(filename)
         filename = DIR + os.path.basename(filename)
         exists = os.path.isfile(filename)
         if not exists:
@@ -122,7 +135,7 @@ def LoadData(scan_name,XAS):
             
             
             waveplate =[x for x in Energy if (np.abs(x) > 0)]
-            waveplate_total = np.append(waeplate_total,np.mean(waveplate))
+            waveplate_total = np.append(waveplate_total,np.mean(waveplate))
             Energy = [x for x in Energy if (np.abs(x) > 0)]
             Energy_eV = np.append(Energy_eV, np.mean(Energy))
         

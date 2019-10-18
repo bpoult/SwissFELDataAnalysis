@@ -32,11 +32,11 @@ from GetXES import get_xes_pumped
 import ProcessedDataClass as PDC 
 
 rixsprodata = PDC.RIXSProData()
-scannum = [11]
-name = "RuDimerACN_timescan_0"
-scan = "RuDimerACN_timescan_0"+ '%02d' % scannum[0]
-loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces/" + scan + "/"
-saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces/Emission/ " + scan + "/"
+scannum = [9]
+name = "RuDimerCl_timescan_0"
+scan = "RuDimerCl_timescan_0"+ '%02d' % scannum[0]
+loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerCl/Kinetic_Traces/" + scan + "/"
+saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerCl/Kinetic_Traces/Emission/ " + scan + "/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
     
@@ -121,11 +121,10 @@ plt.title('scannum ' + str(scannum) + ' off')
 plt.tight_layout()
 
 
-
+#
 #plt.figure()
 #x = np.linspace(0,RIXS_on_01.shape[1],RIXS_on_01.shape[1])
-#plt.plot(x,rixsprodata.RIXS_map_pumped[21,:])
-#plt.plot(x,rixsprodata.RIXS_map_unpumped[21,:])
+#plt.plot(x,rixsprodata.RIXS_map_pumped[15,:]-rixsprodata.RIXS_map_unpumped[15,:])
 #plt.show()
 
 
