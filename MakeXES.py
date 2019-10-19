@@ -24,10 +24,7 @@ from GetXES import get_xes_pumped
 import ProcessedDataClass as PDC 
 
 rixsprodata = PDC.RIXSProData()
-print('What are the lower and upper bounds of the XES scans?')
-scannum_low = int(input())
-scannum_high = int(input())
-scannum = range(scannum_low,scannum_high)
+
 name = "XES_2842.0eV_600fs"
 loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/600fs/" + name + "/"
 saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/600fs/" + name + "/"
@@ -37,71 +34,71 @@ if not os.path.isdir(saveDir):
 with open(loadDir + "xasrawdata.pkl", "rb") as f:
     xasrawdata = pickle.load(f)
 
-exists = os.path.isfile(saveDir + 'rixsprodata.pkl')
+exists = os.path.isfile(saveDir + 'xesprodata.pkl')
 if not exists:
-
-    for jj in range(len(scannum)):
-        scan_name = 'run_000' + '%02d' % scannum[jj]
-        DIR = '/das/work/p17/p17983/cropped_data/' + name + "/"
-        DIRBS = "/sf/alvra/data/p17983/raw/" + name + "/"
-        numsteps = len(xasrawdata.Energy)
-
-        for ii in range(numsteps):
-            filename_base = 'run_000' + '%02d' % scannum[ii]
-
-            XES_on, XES_off = \
-                get_xes_pumped(filename_base,xasrawdata,DIR, DIRBS,2,True,ii)
+    print('What are the lower and upper bounds of the XES scans?')
+    scannum_low = int(input())
+    scannum_high = int(input())
+    scannum = range(scannum_low,scannum_high)
+    DIR = '/das/work/p17/p17983/cropped_data/' + name + "/"
+    DIRBS = "/sf/alvra/data/p17983/raw/" + name + "/"
+    numsteps = len(xasrawdata.Energy)
+    jj = 0
+    for ii in range(numsteps):
+        filename_base = 'run_000' + '%02d' % scannum[ii]
+        XES_on, XES_off = \
+        get_xes_pumped(filename_base,xasrawdata,DIR, DIRBS,2,True,ii)
             
 
-            if ii == 0 & jj == 0:
-                rixs_on_01 = XES_on.sum(axis=0)
-                rixs_off_01 = XES_off.sum(axis=0)
-            else:
-                rixs_on_01 = np.vstack((rixs_on_01,XES_on.sum(axis=0)))
-                rixs_off_01 = np.vstack((rixs_off_01,XES_off.sum(axis=0)))
-            
-            
-        
-        if jj == 0:
-        
-            RIXS_on_01 = rixs_on_01
-            RIXS_off_01 = rixs_off_01
-        
+        if ii == 0 & jj == 0:
+            rixs_on_01 = XES_on.sum(axis=0)
+            rixs_off_01 = XES_off.sum(axis=0)
         else:
+            rixs_on_01 = np.vstack((rixs_on_01,XES_on.sum(axis=0)))
+            rixs_off_01 = np.vstack((rixs_off_01,XES_off.sum(axis=0)))
+            
+            
         
-            RIXS_on_01 = RIXS_on_01 + rixs_on_01
-            RIXS_off_01 = RIXS_off_01 + rixs_off_01
+    if jj == 0:
+        RIXS_on_01 = rixs_on_01
+        RIXS_off_01 = rixs_off_01
+        
+    else:
+        
+        RIXS_on_01 = RIXS_on_01 + rixs_on_01
+        RIXS_off_01 = RIXS_off_01 + rixs_off_01
 
     save = True
     if save is True:
         rixsprodata.changeValue(RIXS_map_pumped=RIXS_on_01, RIXS_map_unpumped = RIXS_off_01)
-        with open(saveDir + "rixsprodata.pkl", "wb") as f:
+        with open(saveDir + "xesprodata.pkl", "wb") as f:
             pickle.dump(rixsprodata, f)
 elif exists:
-    with open(saveDir + "rixsprodata.pkl", "rb") as f:
+    with open(saveDir + "xesprodata.pkl", "rb") as f:
         rixsprodata = pickle.load(f)
 
 RIXSpumped = np.asarray(rixsprodata.RIXS_map_pumped, dtype=np.float32)
 RIXSunpumped = np.asarray(rixsprodata.RIXS_map_unpumped, dtype=np.float32)
 
-X,Y = np.meshgrid(np.linspace(0,RIXSpumped.shape[1],RIXSpumped.shape[1]+1),xasrawdata.Energy)
-plt.subplot(2,1,1)
-plt.pcolor(X,Y,rixsprodata.RIXS_map_pumped, vmax = 0.1)
-plt.colorbar()
-plt.xlabel('JF pixel')
-plt.ylabel('Mono Energy (eV)')
-plt.title('scannum ' + str(scannum) + ' on')
-plt.tight_layout()
 
-X,Y = np.meshgrid(np.linspace(0,RIXSunpumped.shape[1],RIXSunpumped.shape[1]+1),xasrawdata.Energy)
+XES_on = np.sum(RIXSpumped,axis=0)
+XES_off = np.sum(RIXSunpumped,axis=0)
+integral_on = np.trapz(XES_on)
+integral_off = np.trapz(XES_off)
+
+XES_on = XES_on.copy()
+XES_off = XES_off.copy()*integral_on/integral_off
+
 plt.figure()
-plt.subplot(2,1,1)
-plt.pcolor(X,Y,rixsprodata.RIXS_map_unpumped, vmax = 0.1)
-plt.colorbar()
-plt.xlabel('JF pixel')
-plt.ylabel('Mono Energy (eV)')
-plt.title('scannum ' + str(scannum) + ' off')
-plt.tight_layout()
+plt.plot(XES_on[125:200])
+
+plt.figure()
+plt.plot(XES_off[125:200])
+
+plt.figure()
+plt.plot(XES_on[125:200]-XES_off[125:200])
+
+
 
 #plt.figure()
 #x = np.linspace(0,RIXS_on_01.shape[1],RIXS_on_01.shape[1])

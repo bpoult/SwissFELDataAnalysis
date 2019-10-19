@@ -16,9 +16,9 @@ import pickle
 
 
 # Set the scan name and the directories of the scan and its json file
-scan_name = "XES_2842.0eV_600fs"
+scan_name = "XES_2842.0eV_10ps"
 
-saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/600fs/" + scan_name + "/"
+saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/10ps/" + scan_name + "/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
 
