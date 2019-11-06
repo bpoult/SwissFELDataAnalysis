@@ -27,8 +27,8 @@ class XASProData:
         self.__dict__.update(kwargs)
         
 class RIXSProData:
-    _defaults = "","RIXS_map_unpumped",\
-    "Emission_vs_Time_pumped", "mission_vs_Time_unpumped"
+    _defaults = "RIXS_map_pumped","RIXS_map_unpumped",\
+    "Emission_vs_Time_pumped", "Emission_vs_Time_unpumped"
         
         
     _default_value = None
