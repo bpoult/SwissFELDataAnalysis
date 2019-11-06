@@ -24,11 +24,11 @@ from GetXES import get_xes_pumped
 import ProcessedDataClass as PDC 
 
 rixsprodata = PDC.RIXSProData()
-scannum = [1]
-name = "RuDimerCl_monoscan_0"
-scan = "RuDimerCl_monoscan_0"+ '%02d' % scannum[0]
-loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces" + scan + "/"
-saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/Kinetic_Traces/Emission" + scan + "/"
+scannum = [19]
+name = "RuDimerACN_monoscan_0p6ps_0"
+scan = "RuDimerACN_monoscan_0p6ps_0"+ '%02d' % scannum[0]
+loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/600fs/TFY/" + scan + "/"
+saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/RIXS/600fs/roi2/" + scan + "/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
     

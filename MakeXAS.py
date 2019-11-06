@@ -16,15 +16,15 @@ import pickle
 
 
 # Set the scan name and the directories of the scan and its json file
-scan_name = "XES_2842.0eV_10ps"
+scan_name = "RuDimerACN_monoscan_0p6ps_019"
 
-saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/10ps/" + scan_name + "/"
+saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/TFY/600fs/" + scan_name + "/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
 
 exists = os.path.isfile(saveDir + 'xasrawdata.pkl')
 if not exists:
-    xasrawdata = LoadData(scan_name,False,True)
+    xasrawdata = LoadData(scan_name,True,False)
     with open(saveDir + "xasrawdata.pkl", "wb") as f:
         pickle.dump(xasrawdata, f)
         

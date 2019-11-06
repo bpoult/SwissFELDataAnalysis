@@ -25,9 +25,9 @@ import ProcessedDataClass as PDC
 
 rixsprodata = PDC.RIXSProData()
 
-name = "XES_2842.0eV_600fs"
-loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/600fs/" + name + "/"
-saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/600fs/" + name + "/"
+name = "XES_2842pink_Lbeta2_10ps"
+loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/10ps/" + name + "/"
+saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/XES/10ps/" + name + "/roi1/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
     
@@ -47,8 +47,9 @@ if not exists:
     for ii in range(numsteps):
         filename_base = 'run_000' + '%02d' % scannum[ii]
         XES_on, XES_off = \
-        get_xes_pumped(filename_base,xasrawdata,DIR, DIRBS,2,True,ii)
-            
+        get_xes_pumped(filename_base,xasrawdata,DIR, DIRBS,1,False,ii)
+    
+
 
         if ii == 0 & jj == 0:
             rixs_on_01 = XES_on.sum(axis=0)
@@ -86,17 +87,20 @@ XES_off = np.sum(RIXSunpumped,axis=0)
 integral_on = np.trapz(XES_on)
 integral_off = np.trapz(XES_off)
 
+print(integral_on)
+print(integral_off)
+
 XES_on = XES_on.copy()
 XES_off = XES_off.copy()*integral_on/integral_off
 
 plt.figure()
-plt.plot(XES_on[125:200])
+plt.plot(XES_on)
 
 plt.figure()
-plt.plot(XES_off[125:200])
+plt.plot(XES_off)
 
 plt.figure()
-plt.plot(XES_on[125:200]-XES_off[125:200])
+plt.plot(XES_on-XES_off)
 
 
 

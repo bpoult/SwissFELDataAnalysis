@@ -84,36 +84,36 @@ tfy_off_avg = tfy_off_tot/len(tfy_off)
 # plt.tight_layout()
 
 
-plt.figure()
-plt.plot(xasprodata.delays,tfy_on_avg)
-plt.plot(xasprodata.delays,tfy_off_avg)
-plt.plot(xasprodata.delays,(tfy_on_avg-tfy_off_avg)+6)
-plt.xlabel('JF pixel')
-plt.ylabel('Time (ps)')
-plt.legend(('pumped','unpumped','normalized difference'))
-plt.title('DimerACN TFY Kinetic Trace, 2840.3 eV Incident Energy')
-plt.show()
-
-
-plt.figure()
-on = []
-off = []
-diff = []
-for i in range(0,len(xasprodata.delays)):
-    # plt.plot(XESonAVG[i,125:200]-XESoffAVG[i,125:200])
-    on.append(np.trapz(XESonAVG[i, 155:175]))
-    off.append(np.trapz(XESoffAVG[i, 155:175]))
-    diff.append(np.trapz(XESonAVG[i,155:175])-np.sum(XESoffAVG[i,125:200]))
-diff=np.asarray(diff)
-plt.figure()
-plt.plot(xasprodata.delays,on)
-plt.plot(xasprodata.delays,off)
-plt.plot(xasprodata.delays,diff+3.2)
-plt.legend(('pumped','unpumped','normalized difference'))
-plt.xlabel('JF pixel')
-plt.ylabel('Time (ps)')
-plt.title('DimerACN XES Kinetic Trace, 2840.3 eV Incident Energy')
-plt.show()
+#plt.figure()
+#plt.plot(xasprodata.delays,tfy_on_avg)
+#plt.plot(xasprodata.delays,tfy_off_avg)
+#plt.plot(xasprodata.delays,(tfy_on_avg-tfy_off_avg)+6)
+#plt.xlabel('JF pixel')
+#plt.ylabel('Time (ps)')
+#plt.legend(('pumped','unpumped','normalized difference'))
+#plt.title('DimerACN TFY Kinetic Trace, 2840.3 eV Incident Energy')
+#plt.show()
+#
+#
+#plt.figure()
+#on = []
+#off = []
+#diff = []
+#for i in range(0,len(xasprodata.delays)):
+#    # plt.plot(XESonAVG[i,125:200]-XESoffAVG[i,125:200])
+#    on.append(np.trapz(XESonAVG[i, 155:175]))
+#    off.append(np.trapz(XESoffAVG[i, 155:175]))
+#    diff.append(np.trapz(XESonAVG[i,155:175])-np.sum(XESoffAVG[i,125:200]))
+#diff=np.asarray(diff)
+#plt.figure()
+#plt.plot(xasprodata.delays,on)
+#plt.plot(xasprodata.delays,off)
+#plt.plot(xasprodata.delays,diff+3.2)
+#plt.legend(('pumped','unpumped','normalized difference'))
+#plt.xlabel('JF pixel')
+#plt.ylabel('Time (ps)')
+#plt.title('DimerACN XES Kinetic Trace, 2840.3 eV Incident Energy')
+#plt.show()
 
 # X, Y = np.meshgrid(np.linspace(0, XESoffAVG.shape[1], XESoffAVG.shape[1] ), xasprodata.delays)
 # fig = plt.figure()

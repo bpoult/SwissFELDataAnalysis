@@ -10,9 +10,9 @@ from matplotlib import pyplot as plt
 import ProcessedDataClass as PDC 
     
 XASProData = PDC.XASProData()
-numstds = 3.5
-minIzero = 0.025
-lin_filter = 0.07
+numstds = 8
+minIzero = 0.3
+lin_filter = 0.8
 def FilterData(xasrawdata,PlotOn):
 
 # numstds is the number of standard deviations to take from the median

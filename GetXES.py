@@ -25,7 +25,6 @@ from Filter import *
 sys.path.insert(0, '/das/work/p17/p17983/')
 
 def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
-    
     image_threshold = 2
     hot_pixel = 6
 
@@ -84,6 +83,7 @@ def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
     print(images_thr_on.shape[0])
     print(images_thr_off.shape[0])
     
+                
     XES_on = images_thr_on.sum(axis=0)/images_thr_on.shape[0]
     XES_off = images_thr_off.sum(axis=0)/images_thr_off.shape[0]
     
@@ -103,3 +103,4 @@ def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
         XES_off = XES_off * stamp
             
     return XES_on, XES_off
+#,images_good_on,images_good_off
