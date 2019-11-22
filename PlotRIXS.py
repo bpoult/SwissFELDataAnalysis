@@ -9,13 +9,13 @@ import ProcessedDataClass as PDC
 from Looking_at_RIXS import plotRIXS
 from EmissionToLoss import emiss2loss
 
-scans = [3,5,8,10,13]
-base = "RuDimerACN_monoscan_10ps_0"
+scans = [7,9,10]
+base = "RuDimerACN_monoscan_0p6ps_0"
 
 dirxas = "C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Processed/RuDimerACN/TFY" \
-         "/10ps/"
+         "/600fs/"
 dirrixs = "C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Processed/RuDimerACN" \
-          "/RIXS/10ps/"
+          "/RIXS/600fs/roi2/"
 
 with open('JF_Lalpha_Calibration.txt') as f:
     w = [float(x) for x in next(f).split()]  # read first line
