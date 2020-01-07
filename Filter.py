@@ -10,9 +10,9 @@ from matplotlib import pyplot as plt
 import ProcessedDataClass as PDC
 
 XASProData = PDC.XASProData()
-numstds = 3
-minIzero = 0.025
-lin_filter = 0.05
+numstds = 4
+minIzero = 0.015
+lin_filter = 0.02
 
 
 def FilterData(xasrawdata, PlotOn):
@@ -20,11 +20,9 @@ def FilterData(xasrawdata, PlotOn):
     # minIzero sets the minimum permissable Izero
     # lin_filter sets upper and lower bounds for the filter
 
-    FilterParameters = ['numstds:' + str(numstds) + 'minIzero:' + str(minIzero) + 'lin_filter:' + str(lin_filter)]
+    FilterParameters = ['numstds:' + str(numstds) + ' minIzero:' + str(minIzero) + ' lin_filter:' + str(lin_filter)]
     DataFluo_pump_norm_total = np.empty(0)
     DataFluo_unpump_norm_total = np.empty(0)
-    err_DataFluo_pump_total = np.empty(0)
-    err_DataFluo_unpump_total = np.empty(0)
     IzeroFEL_pump_total = np.empty(0)
     IzeroFEL_unpump_total = np.empty(0)
     DataFluo_pump_total = np.empty(0)
@@ -34,6 +32,8 @@ def FilterData(xasrawdata, PlotOn):
     IzeroFEL_unpump_raw_total = np.empty(0)
     DataFluo_pump_raw_total = np.empty(0)
     DataFluo_unpump_raw_total = np.empty(0)
+    Fluo_pump_std = np.empty(0)
+    Fluo_unpump_std = np.empty(0)
     number = len(xasrawdata.DataFluo_pump_total)
 
     IzeroMedian = xasrawdata.IzeroMedian
@@ -64,9 +64,6 @@ def FilterData(xasrawdata, PlotOn):
         conditionUnPumpLinHigh = DataFluo_unpump < IzeroFEL_unpump * linFit_unpump[0] + linFit_unpump[1] + lin_filter
         conditionUnPumpLinLow = DataFluo_unpump > IzeroFEL_unpump * linFit_unpump[0] + linFit_unpump[1] - lin_filter
 
-        condLin_pump = conditionPumpLinHigh & conditionPumpLinLow
-        condLin_unpump = conditionUnPumpLinHigh & conditionUnPumpLinLow
-
         IzeroMedian + numstds * IzeroSTD
 
         conditionPumpMax = IzeroFEL_pump < IzeroMedian + numstds * IzeroSTD
@@ -92,12 +89,11 @@ def FilterData(xasrawdata, PlotOn):
         DataFluo_unpump_total = np.append(DataFluo_unpump_total, DataFluo_unpumpPro)
         DataFluo_pump_norm = DataFluo_pumpPro / IzeroFEL_pumpPro
         DataFluo_unpump_norm = DataFluo_unpumpPro / IzeroFEL_unpumpPro
+        Fluo_pump_std = np.append(Fluo_pump_std,np.std(DataFluo_pump_norm))
+        Fluo_unpump_std = np.append(Fluo_unpump_std,np.std(DataFluo_unpump_norm))
         DataFluo_pump_norm_total = np.append(DataFluo_pump_norm_total, DataFluo_pump_norm.mean())
         DataFluo_unpump_norm_total = np.append(DataFluo_unpump_norm_total, DataFluo_unpump_norm.mean())
-        err_DataFluo_pump_total = np.append(err_DataFluo_pump_total,
-                                            DataFluo_pump_norm.std() / np.sqrt(DataFluo_pump_norm.size))
-        err_DataFluo_unpump_total = np.append(err_DataFluo_unpump_total,
-                                              DataFluo_unpump_norm.std() / np.sqrt(DataFluo_unpump_norm.size))
+
 
         iZero = np.append(iZero, np.mean(IzeroFEL_pump_total))
 
@@ -117,10 +113,10 @@ def FilterData(xasrawdata, PlotOn):
     XASProData.changeValue(Izero_pump_total=IzeroFEL_pump_total, Izero_unpump_total=IzeroFEL_unpump_total
                            , DataFluo_pump_total=DataFluo_pump_total, DataFluo_pump_norm_total=DataFluo_pump_norm_total,
                            DataFluo_unpump_total=DataFluo_unpump_total, DataFluo_unpump_norm_total=DataFluo_unpump_norm_total,
-                           IzeroMedian=IzeroMedian, IzeroSTD=IzeroSTD, Energy=Energy, error_unpump=err_DataFluo_unpump_total,
-                           error_pump=err_DataFluo_pump_total, FilterParameters=FilterParameters,
+                           IzeroMedian=IzeroMedian, IzeroSTD=IzeroSTD, Energy=Energy, FilterParameters=FilterParameters,
                            shotsprefilterpump=shotsprefilterpump, shotspostfilterpump=shotspostfilterpump,
-                           shotsprefilterunpump=shotsprefilterunpump, shotspostfilterunpump=shotspostfilterunpump)
+                           shotsprefilterunpump=shotsprefilterunpump, shotspostfilterunpump=shotspostfilterunpump,
+                           Fluo_pump_std=Fluo_pump_std,Fluo_unpump_std=Fluo_unpump_std)
 
     print("The original number of pumped and unpumped shots is:")
     print(len(xasrawdata.Izero_pump_total[1]) * len(xasrawdata.Izero_pump_total), \

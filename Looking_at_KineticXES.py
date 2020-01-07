@@ -11,7 +11,7 @@ import ProcessedDataClass as PDC
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-scans = [17, 20, 21, 26, 29]
+scans = [20]
 XESon = []
 XESoff = []
 tfy_on = []
@@ -83,10 +83,10 @@ XESoffAVG_new = np.asarray(XESoffAVG_new)
 
 
 
-plt.figure()
-plt.plot(normconstants_on,label='on')
-plt.plot(normconstants_off,label = 'off')
-plt.show()
+# plt.figure()
+# plt.plot(normconstants_on,label='on')
+# plt.plot(normconstants_off,label = 'off')
+# plt.show()
 
 # X, Y = np.meshgrid(np.linspace(0, XESonAVG.shape[1], XESonAVG.shape[1] + 1), xasprodata.delays)
 # plt.subplot(2, 1, 1)
@@ -120,7 +120,7 @@ plt.show()
 # plt.tight_layout()
 
 
-<<<<<<< HEAD
+
 #plt.figure()
 #plt.plot(xasprodata.delays,tfy_on_avg)
 #plt.plot(xasprodata.delays,tfy_off_avg)
@@ -151,16 +151,15 @@ plt.show()
 #plt.ylabel('Time (ps)')
 #plt.title('DimerACN XES Kinetic Trace, 2840.3 eV Incident Energy')
 #plt.show()
-=======
-# plt.figure()
-# plt.plot(xasprodata.delays,tfy_on_avg)
-# plt.plot(xasprodata.delays,tfy_off_avg)
-# plt.plot(xasprodata.delays,(tfy_on_avg-tfy_off_avg)+6)
-# plt.xlabel('JF pixel')
-# plt.ylabel('Time (ps)')
-# plt.legend(('pumped','unpumped','normalized difference'))
-# plt.title('DimerACN TFY Kinetic Trace, 2840.3 eV Incident Energy')
-# plt.show()
+plt.figure()
+plt.plot(xasprodata.delays,tfy_on_avg)
+plt.plot(xasprodata.delays,tfy_off_avg)
+plt.plot(xasprodata.delays,(tfy_on_avg-tfy_off_avg)+6)
+plt.xlabel('JF pixel')
+plt.ylabel('Time (ps)')
+plt.legend(('pumped','unpumped','normalized difference'))
+plt.title('DimerACN TFY Kinetic Trace, 2840.3 eV Incident Energy')
+plt.show()
 #
 #
 # # plt.figure()
@@ -182,7 +181,6 @@ plt.show()
 # plt.ylabel('Time (ps)')
 # plt.title('DimerACN XES Kinetic Trace, 2840.3 eV Incident Energy')
 # plt.show()
->>>>>>> e63b6c71b678befdd1b621be40d06947bd0c9bb0
 
 # X, Y = np.meshgrid(np.linspace(0, XESoffAVG.shape[1], XESoffAVG.shape[1] ), xasprodata.delays)
 # fig = plt.figure()
@@ -202,19 +200,19 @@ plt.show()
 # plt.ylabel('Time (ps)')
 # plt.title('DimerACN XES unpumped')
 # #
-X, Y = np.meshgrid(np.linspace(0, XESoffAVG.shape[1], XESoffAVG.shape[1]), xasprodata.delays)
-fig = plt.figure()
-ax = Axes3D(fig)
-surf = ax.plot_surface(X, Y, np.divide(np.subtract(XESonAVG,XESoffAVG),XESoffAVG),cmap=cm.jet, linewidth=0.1, vmin=-0.03, vmax=2)
-fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.xlabel('JF pixel')
-plt.ylabel('Time (ps)')
-plt.title('off')
-X, Y = np.meshgrid(np.linspace(0, XESoffAVG[:,110:180].shape[1], XESoffAVG[:,110:180].shape[1]), xasprodata.delays)
-fig = plt.figure()
-ax = Axes3D(fig)
-surf = ax.plot_surface(X, Y, np.divide(np.subtract(XESonAVG_new[:,110:180],XESoffAVG_new[:,110:180]),XESoffAVG_new[:,110:180]),cmap=cm.jet, linewidth=0.1, vmin=-0.03, vmax=2)
-fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.xlabel('JF pixel')
-plt.ylabel('Time (ps)')
-plt.title('on')
+# X, Y = np.meshgrid(np.linspace(0, XESoffAVG.shape[1], XESoffAVG.shape[1]), xasprodata.delays)
+# fig = plt.figure()
+# ax = Axes3D(fig)
+# surf = ax.plot_surface(X, Y, np.divide(np.subtract(XESonAVG,XESoffAVG),XESoffAVG),cmap=cm.jet, linewidth=0.1, vmin=-0.03, vmax=2)
+# fig.colorbar(surf, shrink=0.5, aspect=5)
+# plt.xlabel('JF pixel')
+# plt.ylabel('Time (ps)')
+# plt.title('off')
+# X, Y = np.meshgrid(np.linspace(0, XESoffAVG[:,110:180].shape[1], XESoffAVG[:,110:180].shape[1]), xasprodata.delays)
+# fig = plt.figure()
+# ax = Axes3D(fig)
+# surf = ax.plot_surface(X, Y, np.divide(np.subtract(XESonAVG_new[:,110:180],XESoffAVG_new[:,110:180]),XESoffAVG_new[:,110:180]),cmap=cm.jet, linewidth=0.1, vmin=-0.03, vmax=2)
+# fig.colorbar(surf, shrink=0.5, aspect=5)
+# plt.xlabel('JF pixel')
+# plt.ylabel('Time (ps)')
+# plt.title('on')
