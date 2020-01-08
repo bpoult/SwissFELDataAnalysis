@@ -19,13 +19,13 @@ TotalShotsPumped = []
 TotalShotsUnpumped = []
 TFY_Difference = []
 
-scans = [8,10,11,12]
+scans = [12]
 
-scan_name = "RuDimerCl_monoscan_0p6ps_0"
-# scan_name = "RuDimerACN_monoscan_10ps_0"
+# scan_name = "RuDimerCl_monoscan_0p6ps_0"
+scan_name = "RuDimerACN_monoscan_0p6ps_0"
 plt.figure()
 for i in range(0, len(scans)):
-    saveDir = "C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Processed/RuDimerCl/TFY" \
+    saveDir = "C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Processed/RuDimerACN/TFY" \
               "/600fs/" + scan_name + '%02d/' % scans[i]
     if not os.path.isdir(saveDir):
         os.mkdir(saveDir)
@@ -37,8 +37,8 @@ for i in range(0, len(scans)):
         with open(saveDir + "xasrawdata.pkl", "rb") as f:
             xasrawdata = pickle.load(f)
 
-    saveProData = False
-    loadProData = True
+    saveProData = True
+    loadProData = False
     ReferenceEnergy = [2852.0, 2851.0, 2850.0, 2849.0, 2848.0, 2847.0, 2846.5, 2846.0, 2845.5, 2845.0, 2844.75, 2844.5,
                        2844.25, 2844.0,
                        2843.75, 2843.5, 2843.25, 2843.0, 2842.75, 2842.5, 2842.25, 2842.0, 2841.75, 2841.5, 2841.25,
@@ -50,7 +50,7 @@ for i in range(0, len(scans)):
     Energy = ReferenceEnergy
     if saveProData is True:
         with open(saveDir + "xasprodata.pkl", "wb") as f:
-            xasprodata = FilterData(xasrawdata, False)
+            xasprodata = FilterData(xasrawdata, False,True)
             pickle.dump(xasprodata, f)
 
     if loadProData is True:
@@ -58,10 +58,6 @@ for i in range(0, len(scans)):
             xasprodata = pickle.load(f)
     difference = np.divide(np.subtract(xasprodata.DataFluo_pump_norm_total,xasprodata.DataFluo_unpump_norm_total),
                            xasprodata.DataFluo_unpump_norm_total)
-    err_pump_high = xasprodata.DataFluo_pump_norm_total + xasprodata.error_pump
-    err_pump_low = xasprodata.DataFluo_pump_norm_total - xasprodata.error_pump
-    err_unpump_high = xasprodata.DataFluo_unpump_norm_total + xasprodata.error_unpump
-    err_unpump_low = xasprodata.DataFluo_unpump_norm_total - xasprodata.error_unpump
     index = []
     for elements in range(0, len(xasrawdata.Energy)):
         Element = min(ReferenceEnergy, key=lambda var: abs(var - xasrawdata.Energy[elements]))
@@ -82,10 +78,6 @@ for i in range(0, len(scans)):
         addVals = index[variable]
         TFYpump[i][addVals] = xasprodata.DataFluo_pump_norm_total[variable]
         TFYunpump[i][addVals] = xasprodata.DataFluo_unpump_norm_total[variable]
-        PumpErrHigh[i][addVals] = err_pump_high[variable]
-        PumpErrLow[i][addVals] = err_pump_low[variable]
-        UnPumpErrHigh[i][addVals] = err_unpump_high[variable]
-        UnPumpErrLow[i][addVals] = err_unpump_low[variable]
         TotalShotsPumped[i][addVals] = xasprodata.shotspostfilterpump[variable]
         TotalShotsUnpumped[i][addVals] = xasprodata.shotspostfilterunpump[variable]
         TFY_Difference[i][addVals] = difference[variable]
@@ -93,10 +85,6 @@ for i in range(0, len(scans)):
 Energy = np.asarray(Energy)
 TFYpump = np.asarray(TFYpump)
 TFYunpump = np.asarray(TFYunpump)
-PumpErrHigh = np.asarray(PumpErrHigh)
-PumpErrLow = np.asarray(PumpErrLow)
-UnPumpErrHigh = np.asarray(UnPumpErrHigh)
-UnPumpErrLow = np.asarray(UnPumpErrLow)
 TotalShotsPumped = np.asarray(TotalShotsPumped)
 TotalShotsUnpumped = np.asarray(TotalShotsUnpumped)
 TFY_Difference = np.asarray(TFY_Difference)
@@ -111,10 +99,6 @@ TFY_Difference = np.asarray(TFY_Difference)
 
 TFYunpump[TFYunpump == 0] = np.nan
 TFYpump[TFYpump == 0] = np.nan
-PumpErrHigh[PumpErrHigh == 0] = np.nan
-PumpErrLow[PumpErrLow == 0] = np.nan
-UnPumpErrHigh[UnPumpErrHigh == 0] = np.nan
-UnPumpErrLow[UnPumpErrLow == 0] = np.nan
 TFY_Difference[TFY_Difference == 0] = np.nan
 avgs = TFYunpump.shape[0]
 full_list = TFY_Difference.copy()

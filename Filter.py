@@ -7,6 +7,7 @@ Created on Thu Sep  5 21:07:23 2019
 """
 import numpy as np
 from matplotlib import pyplot as plt
+from TimeCorrection import TimeCorrection
 import ProcessedDataClass as PDC
 
 XASProData = PDC.XASProData()
@@ -15,10 +16,13 @@ minIzero = 0.015
 lin_filter = 0.02
 
 
-def FilterData(xasrawdata, PlotOn):
+def FilterData(xasrawdata, PlotOn, CorrectTime):
     # numstds is the number of standard deviations to take from the median
     # minIzero sets the minimum permissable Izero
     # lin_filter sets upper and lower bounds for the filter
+    if CorrectTime is True:
+        time_zero_mm = 156.2826
+        xasrawdata = TimeCorrection(xasrawdata,time_zero_mm)
 
     FilterParameters = ['numstds:' + str(numstds) + ' minIzero:' + str(minIzero) + ' lin_filter:' + str(lin_filter)]
     DataFluo_pump_norm_total = np.empty(0)
@@ -34,6 +38,9 @@ def FilterData(xasrawdata, PlotOn):
     DataFluo_unpump_raw_total = np.empty(0)
     Fluo_pump_std = np.empty(0)
     Fluo_unpump_std = np.empty(0)
+    PulseID_pump_total = np.empty(0)
+    PulseID_unpump_total = np.empty(0)
+    time_delay_ps_total = np.empty(0)
     number = len(xasrawdata.DataFluo_pump_total)
 
     IzeroMedian = xasrawdata.IzeroMedian
@@ -49,6 +56,9 @@ def FilterData(xasrawdata, PlotOn):
         DataFluo_unpump = xasrawdata.DataFluo_unpump_total[i]
         IzeroFEL_pump = xasrawdata.Izero_pump_total[i]
         IzeroFEL_unpump = xasrawdata.Izero_unpump_total[i]
+        PulseID_pump = xasrawdata.pulseIDs_pump[i]
+        PulseID_unpump = xasrawdata.pulseIDs_unpump[i]
+        time_delay_ps = xasrawdata.Tcorrected_pump[i]
 
         IzeroFEL_pump_raw_total = np.append(IzeroFEL_pump_raw_total, IzeroFEL_pump)
         IzeroFEL_unpump_raw_total = np.append(IzeroFEL_unpump_raw_total, IzeroFEL_unpump)
@@ -79,7 +89,6 @@ def FilterData(xasrawdata, PlotOn):
 
         IzeroFEL_pumpPro = IzeroFEL_pump[condIzeroPump]
         IzeroFEL_unpumpPro = IzeroFEL_unpump[condIzeroUnPump]
-
         IzeroFEL_pump_total = np.append(IzeroFEL_pump_total, IzeroFEL_pumpPro)
         IzeroFEL_unpump_total = np.append(IzeroFEL_unpump_total, IzeroFEL_unpumpPro)
 
@@ -87,6 +96,15 @@ def FilterData(xasrawdata, PlotOn):
         DataFluo_unpumpPro = DataFluo_unpump[condIzeroUnPump]
         DataFluo_pump_total = np.append(DataFluo_pump_total, DataFluo_pumpPro)
         DataFluo_unpump_total = np.append(DataFluo_unpump_total, DataFluo_unpumpPro)
+
+        PulseID_pumpPro = PulseID_pump[condIzeroPump]
+        PulseID_unpumpPro = PulseID_unpump[condIzeroUnPump]
+        PulseID_pump_total = np.append(PulseID_pump_total,PulseID_pumpPro)
+        PulseID_unpump_total = np.append(PulseID_unpump_total,PulseID_unpumpPro)
+
+        time_delay_psPro = time_delay_ps[condIzeroPump]
+        time_delay_ps_total = np.append(time_delay_ps_total,time_delay_psPro)
+
         DataFluo_pump_norm = DataFluo_pumpPro / IzeroFEL_pumpPro
         DataFluo_unpump_norm = DataFluo_unpumpPro / IzeroFEL_unpumpPro
         Fluo_pump_std = np.append(Fluo_pump_std,np.std(DataFluo_pump_norm))
@@ -116,7 +134,8 @@ def FilterData(xasrawdata, PlotOn):
                            IzeroMedian=IzeroMedian, IzeroSTD=IzeroSTD, Energy=Energy, FilterParameters=FilterParameters,
                            shotsprefilterpump=shotsprefilterpump, shotspostfilterpump=shotspostfilterpump,
                            shotsprefilterunpump=shotsprefilterunpump, shotspostfilterunpump=shotspostfilterunpump,
-                           Fluo_pump_std=Fluo_pump_std,Fluo_unpump_std=Fluo_unpump_std)
+                           Fluo_pump_std=Fluo_pump_std,Fluo_unpump_std=Fluo_unpump_std, PulseID_pump_total=PulseID_pump_total,
+                           PulseID_unpump_total=PulseID_unpump_total)
 
     print("The original number of pumped and unpumped shots is:")
     print(len(xasrawdata.Izero_pump_total[1]) * len(xasrawdata.Izero_pump_total), \
