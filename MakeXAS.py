@@ -16,7 +16,7 @@ import pickle
 
 
 # Set the scan name and the directories of the scan and its json file
-scan_name = "RuDimerACN_monoscan_0p6ps_019"
+scan_name = "RuDimerACN_monoscan_0p6ps_012"
 
 saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/TFY/600fs/" + scan_name + "/"
 if not os.path.isdir(saveDir):
@@ -37,18 +37,11 @@ elif exists:
 saveProData = True
 loadProData = False
 
-xasprodata = FilterData(xasrawdata,True)
-
-err_pump_high = xasprodata.DataFluo_pump_norm_total + xasprodata.error_pump
-err_pump_low = xasprodata.DataFluo_pump_norm_total - xasprodata.error_pump
-err_unpump_high = xasprodata.DataFluo_unpump_norm_total + xasprodata.error_unpump
-err_unpump_low = xasprodata.DataFluo_unpump_norm_total - xasprodata.error_unpump
+xasprodata = FilterData(xasrawdata,True,True)
 
 plt.figure()
 plt.plot(xasprodata.Energy, xasprodata.DataFluo_pump_norm_total,color = 'blue',label='Pumped')
-plt.fill_between(xasprodata.Energy,err_pump_high,err_pump_low,alpha = 0.3, color = 'blue')
 plt.plot(xasprodata.Energy, xasprodata.DataFluo_unpump_norm_total,color = 'orange',label='UnPumped')
-plt.fill_between(xasprodata.Energy,err_unpump_high,err_unpump_low,alpha = 0.3, color = 'orange')
 plt.xlabel('energy (eV)')
 plt.ylabel('absorption')
 plt.title('XAS_'+ scan_name)

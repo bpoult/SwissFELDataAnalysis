@@ -114,8 +114,9 @@ def LoadData(scan_name,XAS,XES):
             DataFluo_pump_original_total.append(DataFluo_pump.T[0])
             DataFluo_unpump_original_total.append(DataFluo_unpump.T[0])
             
-            pulseIDs_pump_total.append(pulseIDs_pump.T[0])
-            pulseIDs_unpump_total.append(pulseIDs_unpump.T[0])
+            pulseIDs_pump_total.append(pulseIDs_pump)
+            pulseIDs_unpump_total.append(pulseIDs_unpump)
+            
             
             delay_pump_total.append(delay_pump.T[0])
             delay_SH_pump_total.append(delay_SH_pump.T[0])

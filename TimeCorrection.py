@@ -13,7 +13,7 @@ def TimeCorrection(xasrawdata, Tzero_mm):
             column.append(delay_ps[i][j] + xasrawdata.PALM_pump[i][j] * 1e-3)
         Tcorrected_pump.append(column)
         column = []
-
+        Tcorrected_pump[i]=np.asarray(Tcorrected_pump[i])
     xasrawdata.changeValue(delay_ps=delay_ps,
                            Tcorrected_pump=Tcorrected_pump)
 

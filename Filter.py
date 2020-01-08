@@ -135,7 +135,7 @@ def FilterData(xasrawdata, PlotOn, CorrectTime):
                            shotsprefilterpump=shotsprefilterpump, shotspostfilterpump=shotspostfilterpump,
                            shotsprefilterunpump=shotsprefilterunpump, shotspostfilterunpump=shotspostfilterunpump,
                            Fluo_pump_std=Fluo_pump_std,Fluo_unpump_std=Fluo_unpump_std, PulseID_pump_total=PulseID_pump_total,
-                           PulseID_unpump_total=PulseID_unpump_total)
+                           PulseID_unpump_total=PulseID_unpump_total,time_delay_ps_total=time_delay_ps_total)
 
     print("The original number of pumped and unpumped shots is:")
     print(len(xasrawdata.Izero_pump_total[1]) * len(xasrawdata.Izero_pump_total), \
