@@ -55,7 +55,7 @@ def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
     print(images_off.shape[0])
 
     
-    condFinalPump, condFinalUnPump = FilteringStuff(ii,xasrawdata)
+    condFinalPump, condFinalUnPump,FilterParameters = FilteringStuff(ii,xasrawdata)
 
     images_good_on = images_on
     images_good_off = images_off
@@ -102,5 +102,5 @@ def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
         XES_on = XES_on * stamp
         XES_off = XES_off * stamp
             
-    return XES_on, XES_off
+    return XES_on, XES_off, FilterParameters
 #,images_good_on,images_good_off

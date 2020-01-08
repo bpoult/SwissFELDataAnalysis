@@ -16,7 +16,7 @@ import pickle
 
 
 # Set the scan name and the directories of the scan and its json file
-scan_name = "RuDimerACN_monoscan_0p6ps_012"
+scan_name = "RuDimerACN_monoscan_0p6ps_020"
 
 saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/TFY/600fs/" + scan_name + "/"
 if not os.path.isdir(saveDir):

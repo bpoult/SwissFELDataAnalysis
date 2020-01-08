@@ -24,10 +24,10 @@ from GetXES import get_xes_pumped
 import ProcessedDataClass as PDC 
 
 rixsprodata = PDC.RIXSProData()
-scannum = [19]
+scannum = [16]
 name = "RuDimerACN_monoscan_0p6ps_0"
 scan = "RuDimerACN_monoscan_0p6ps_0"+ '%02d' % scannum[0]
-loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/600fs/TFY/" + scan + "/"
+loadDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/TFY/600fs/" + scan + "/"
 saveDir = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/RuDimerACN/RIXS/600fs/roi2/" + scan + "/"
 if not os.path.isdir(saveDir):
     os.mkdir(saveDir)
@@ -46,7 +46,7 @@ if not exists:
         numsteps = len(xasrawdata.Energy)
 
         for ii in range(numsteps):
-            XES_on, XES_off = \
+            XES_on, XES_off,FilterParameters = \
                 get_xes_pumped(filename_base + '%02d' % (ii+0),xasrawdata,DIR, DIRBS,2,True,ii)
             
 
@@ -71,7 +71,8 @@ if not exists:
 
     save = True
     if save is True:
-        rixsprodata.changeValue(RIXS_map_pumped=RIXS_on_01, RIXS_map_unpumped = RIXS_off_01)
+        rixsprodata.changeValue(RIXS_map_pumped=RIXS_on_01, RIXS_map_unpumped = RIXS_off_01,
+                                FilterParameters=FilterParameters)
         with open(saveDir + "rixsprodata.pkl", "wb") as f:
             pickle.dump(rixsprodata, f)
 elif exists:

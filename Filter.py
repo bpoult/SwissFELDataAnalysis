@@ -13,7 +13,7 @@ import ProcessedDataClass as PDC
 XASProData = PDC.XASProData()
 numstds = 4
 minIzero = 0.015
-lin_filter = 0.02
+lin_filter = 0.03
 
 
 def FilterData(xasrawdata, PlotOn, CorrectTime):
@@ -175,6 +175,7 @@ def FilterData(xasrawdata, PlotOn, CorrectTime):
 
 
 def FilteringStuff(i, xasrawdata):
+    FilterParameters = ['numstds:' + str(numstds) + ' minIzero:' + str(minIzero) + ' lin_filter:' + str(lin_filter)]
     IzeroMedian = xasrawdata.IzeroMedian
     IzeroSTD = xasrawdata.IzeroSTD
     DataFluo_pump = xasrawdata.DataFluo_pump_total[i]
@@ -210,4 +211,4 @@ def FilteringStuff(i, xasrawdata):
     condFinalPump = condLin_pump & condIzeroPump
     condFinalUnPump = condLin_unpump & condIzeroUnPump
 
-    return condFinalPump, condFinalUnPump
+    return condFinalPump, condFinalUnPump, FilterParameters
