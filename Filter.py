@@ -14,17 +14,19 @@ XASProData = PDC.XASProData()
 numstds = 4
 minIzero = 0.015
 lin_filter = 0.03
+minTime = 0.6
+maxTime = 0.7
 
 
-def FilterData(xasrawdata, PlotOn, CorrectTime):
+def FilterData(xasrawdata, PlotOn, time_zero_mm):
     # numstds is the number of standard deviations to take from the median
     # minIzero sets the minimum permissable Izero
     # lin_filter sets upper and lower bounds for the filter
-    if CorrectTime is True:
-        time_zero_mm = 156.2826
-        xasrawdata = TimeCorrection(xasrawdata,time_zero_mm)
+    if time_zero_mm > 0:
+        xasrawdata = TimeCorrection(xasrawdata, time_zero_mm)
 
-    FilterParameters = ['numstds:' + str(numstds) + ' minIzero:' + str(minIzero) + ' lin_filter:' + str(lin_filter)]
+    FilterParameters = ['numstds:' + str(numstds) + ' minIzero:' + str(minIzero) + ' lin_filter:' + str(lin_filter),
+                        'minTime: ' + str(minTime), 'maxTime: ' + str(maxTime)]
     DataFluo_pump_norm_total = np.empty(0)
     DataFluo_unpump_norm_total = np.empty(0)
     IzeroFEL_pump_total = np.empty(0)
@@ -83,8 +85,11 @@ def FilterData(xasrawdata, PlotOn, CorrectTime):
         conditionUnPumpMax = IzeroFEL_unpump < IzeroMedian + numstds * IzeroSTD
         conditionUnPumpMin = IzeroFEL_unpump > IzeroMedian - numstds * IzeroSTD
         conditionUnPumpLow = IzeroFEL_unpump > minIzero
+        conditionTimePumpLow = time_delay_ps > minTime
+        conditionTimePumpHigh = time_delay_ps < maxTime
 
-        condIzeroPump = conditionPumpMax & conditionPumpMin & conditionPumpLow & conditionPumpLinHigh & conditionPumpLinLow
+        condIzeroPump = conditionPumpMax & conditionPumpMin & conditionPumpLow & conditionPumpLinHigh & conditionPumpLinLow & conditionTimePumpLow & conditionTimePumpHigh
+
         condIzeroUnPump = conditionUnPumpMax & conditionUnPumpMin & conditionUnPumpLow & conditionUnPumpLinHigh & conditionUnPumpLinLow
 
         IzeroFEL_pumpPro = IzeroFEL_pump[condIzeroPump]
@@ -99,19 +104,18 @@ def FilterData(xasrawdata, PlotOn, CorrectTime):
 
         PulseID_pumpPro = PulseID_pump[condIzeroPump]
         PulseID_unpumpPro = PulseID_unpump[condIzeroUnPump]
-        PulseID_pump_total = np.append(PulseID_pump_total,PulseID_pumpPro)
-        PulseID_unpump_total = np.append(PulseID_unpump_total,PulseID_unpumpPro)
+        PulseID_pump_total = np.append(PulseID_pump_total, PulseID_pumpPro)
+        PulseID_unpump_total = np.append(PulseID_unpump_total, PulseID_unpumpPro)
 
         time_delay_psPro = time_delay_ps[condIzeroPump]
-        time_delay_ps_total = np.append(time_delay_ps_total,time_delay_psPro)
+        time_delay_ps_total = np.append(time_delay_ps_total, time_delay_psPro)
 
         DataFluo_pump_norm = DataFluo_pumpPro / IzeroFEL_pumpPro
         DataFluo_unpump_norm = DataFluo_unpumpPro / IzeroFEL_unpumpPro
-        Fluo_pump_std = np.append(Fluo_pump_std,np.std(DataFluo_pump_norm))
-        Fluo_unpump_std = np.append(Fluo_unpump_std,np.std(DataFluo_unpump_norm))
+        Fluo_pump_std = np.append(Fluo_pump_std, np.std(DataFluo_pump_norm))
+        Fluo_unpump_std = np.append(Fluo_unpump_std, np.std(DataFluo_unpump_norm))
         DataFluo_pump_norm_total = np.append(DataFluo_pump_norm_total, DataFluo_pump_norm.mean())
         DataFluo_unpump_norm_total = np.append(DataFluo_unpump_norm_total, DataFluo_unpump_norm.mean())
-
 
         iZero = np.append(iZero, np.mean(IzeroFEL_pump_total))
 
@@ -130,12 +134,14 @@ def FilterData(xasrawdata, PlotOn, CorrectTime):
 
     XASProData.changeValue(Izero_pump_total=IzeroFEL_pump_total, Izero_unpump_total=IzeroFEL_unpump_total
                            , DataFluo_pump_total=DataFluo_pump_total, DataFluo_pump_norm_total=DataFluo_pump_norm_total,
-                           DataFluo_unpump_total=DataFluo_unpump_total, DataFluo_unpump_norm_total=DataFluo_unpump_norm_total,
+                           DataFluo_unpump_total=DataFluo_unpump_total,
+                           DataFluo_unpump_norm_total=DataFluo_unpump_norm_total,
                            IzeroMedian=IzeroMedian, IzeroSTD=IzeroSTD, Energy=Energy, FilterParameters=FilterParameters,
                            shotsprefilterpump=shotsprefilterpump, shotspostfilterpump=shotspostfilterpump,
                            shotsprefilterunpump=shotsprefilterunpump, shotspostfilterunpump=shotspostfilterunpump,
-                           Fluo_pump_std=Fluo_pump_std,Fluo_unpump_std=Fluo_unpump_std, PulseID_pump_total=PulseID_pump_total,
-                           PulseID_unpump_total=PulseID_unpump_total,time_delay_ps_total=time_delay_ps_total)
+                           Fluo_pump_std=Fluo_pump_std, Fluo_unpump_std=Fluo_unpump_std,
+                           PulseID_pump_total=PulseID_pump_total,
+                           PulseID_unpump_total=PulseID_unpump_total, time_delay_ps_total=time_delay_ps_total)
 
     print("The original number of pumped and unpumped shots is:")
     print(len(xasrawdata.Izero_pump_total[1]) * len(xasrawdata.Izero_pump_total), \

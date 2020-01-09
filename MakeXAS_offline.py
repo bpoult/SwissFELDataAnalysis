@@ -6,6 +6,7 @@ from Filter import FilterData
 import pickle
 import ProcessedDataClass as PDC
 import RawDataClass as RDC
+from TimeCorrection import ps_to_mm
 
 # Set the scan name and the directories of the scan and its json file
 Energy = []
@@ -19,8 +20,8 @@ TotalShotsPumped = []
 TotalShotsUnpumped = []
 TFY_Difference = []
 
-scans = [12]
-
+scans = [6, 7, 9, 10, 11, 12, 14, 16, 17, 18, 20]
+time_zero_mm_original = 156.3276
 # scan_name = "RuDimerCl_monoscan_0p6ps_0"
 scan_name = "RuDimerACN_monoscan_0p6ps_0"
 plt.figure()
@@ -50,7 +51,16 @@ for i in range(0, len(scans)):
     Energy = ReferenceEnergy
     if saveProData is True:
         with open(saveDir + "xasprodata.pkl", "wb") as f:
-            xasprodata = FilterData(xasrawdata, False,True)
+            x = scans[i]
+            if x == 6 or x == 7:
+                time_zero_mm = time_zero_mm_original + ps_to_mm(0.17995)
+            if x == 9:
+                time_zero_mm = time_zero_mm_original + ps_to_mm(-0.2083)
+            if x == 10 or x == 11 or x == 12 or x == 14:
+                time_zero_mm = time_zero_mm_original + ps_to_mm(-0.34772)
+            if x == 16 or x == 17 or x == 18 or x == 20:
+                time_zero_mm = time_zero_mm_original + ps_to_mm(-0.02141)
+            xasprodata = FilterData(xasrawdata, False,time_zero_mm)
             pickle.dump(xasprodata, f)
 
     if loadProData is True:
