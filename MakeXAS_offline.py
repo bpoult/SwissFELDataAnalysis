@@ -6,7 +6,7 @@ from Filter import FilterData
 import pickle
 import ProcessedDataClass as PDC
 import RawDataClass as RDC
-from TimeCorrection import ps_to_mm
+from TimeCorrection import *
 
 # Set the scan name and the directories of the scan and its json file
 Energy = []
@@ -20,14 +20,14 @@ TotalShotsPumped = []
 TotalShotsUnpumped = []
 TFY_Difference = []
 
-scans = [6, 7, 9, 10, 11, 12, 14, 16, 17, 18, 20]
+scans = [7, 9, 10, 12, 14, 16, 17, 18, 20]
 time_zero_mm_original = 156.3276
 # scan_name = "RuDimerCl_monoscan_0p6ps_0"
-scan_name = "RuDimerACN_monoscan_0p6ps_0"
+scan_name = "RuDimerACN_monoscan_10ps_0"
 plt.figure()
 for i in range(0, len(scans)):
     saveDir = "C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Processed/RuDimerACN/TFY" \
-              "/600fs/" + scan_name + '%02d/' % scans[i]
+              "/10ps/" + scan_name + '%02d/' % scans[i]
     if not os.path.isdir(saveDir):
         os.mkdir(saveDir)
 
@@ -60,20 +60,20 @@ for i in range(0, len(scans)):
                 time_zero_mm = time_zero_mm_original + ps_to_mm(-0.34772)
             if x == 16 or x == 17 or x == 18 or x == 20:
                 time_zero_mm = time_zero_mm_original + ps_to_mm(-0.02141)
+            xasrawdata = TimeCorrection(xasrawdata,time_zero_mm)
             xasprodata = FilterData(xasrawdata, False,time_zero_mm)
             pickle.dump(xasprodata, f)
 
     if loadProData is True:
         with open(saveDir + "xasprodata.pkl", "rb") as f:
             xasprodata = pickle.load(f)
+
     difference = np.divide(np.subtract(xasprodata.DataFluo_pump_norm_total,xasprodata.DataFluo_unpump_norm_total),
                            xasprodata.DataFluo_unpump_norm_total)
     index = []
     for elements in range(0, len(xasrawdata.Energy)):
         Element = min(ReferenceEnergy, key=lambda var: abs(var - xasrawdata.Energy[elements]))
         index.append(ReferenceEnergy.index(Element))
-
-
 
     TFYpump.append([0] * 55)
     TFYunpump.append([0] * 55)
@@ -120,17 +120,17 @@ UnPumpErrHigh = np.nanmean(UnPumpErrHigh, axis=0)
 UnPumpErrLow = np.nanmean(UnPumpErrLow, axis=0)
 TotalShotsPumped = np.sum(TotalShotsPumped, axis=0)
 TotalShotsUnpumped = np.sum(TotalShotsUnpumped, axis=0)
+stdev = np.nanstd(TFY_Difference,axis=0)
 TFY_Difference = np.nanmean(TFY_Difference,axis=0)
 
-# plt.figure()
-# plt.plot(Energy, TFYpump, color='blue', label='Pumped')
-# plt.fill_between(Energy, PumpErrHigh, PumpErrLow, alpha=0.3, color='blue')
-# plt.plot(Energy, TFYunpump, color='orange', label='UnPumped')
-# plt.fill_between(Energy, UnPumpErrHigh, UnPumpErrLow, alpha=0.3, color='orange')
-# plt.xlabel('energy (eV)')
-# plt.ylabel('absorption')
-# plt.title('XAS')
-# plt.legend()
+stdev_high = np.add(TFY_Difference,stdev)
+stdev_low = np.subtract(TFY_Difference,stdev)
+plt.figure()
+plt.plot(Energy, TFY_Difference, color='blue')
+plt.fill_between(Energy, stdev_high, stdev_low, alpha=0.3, color='blue')
+plt.xlabel('energy (eV)')
+plt.ylabel('Delta T / T')
+plt.title('XAS')
 
 plt.figure()
 plt.plot(Energy, TFY_Difference)
@@ -141,14 +141,15 @@ plt.ylabel('absorption')
 
 Dir = 'C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Processed/RuDimerACN/TFY' \
       '/600fs/'
-save = False
+save = True
 XASAveraged = PDC.XASAveraged()
 XASAveraged.changeValue(Averaged_Spectrum_unpumped=TFYunpump, Scans_in_average=scans,
                         Shots_Per_Point_unpumped=TotalShotsUnpumped, Energy=Energy)
 if save:
     with open(Dir + "Pumped_Averaged_600fs.pkl", "wb") as f:
         pickle.dump(XASAveraged, f)
-    sp.savemat('C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Dec-05-2019/DimerCl/600fs_DifferenceSpectra_All.mat',
-               mdict={'Difference_600fs_All': TFY_Difference, 'TotalShots_600fs_All_pumped': TotalShotsPumped,
-                      'TotalShots_600fs_All_unpumped': TotalShotsUnpumped,'Energy': Energy,'All_Scans_600fs_All': full_list})
-#
+    sp.savemat('C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Jan-16-2020/DimerACN/DifferenceSpectra_time_filter.mat',
+               mdict={'pumped':TFYpump,'Difference_time_filter': TFY_Difference, 'TotalShots_time_filter': TotalShotsPumped,
+                      'TotalShots_time_filter': TotalShotsUnpumped,'Energy': Energy,'All_Scans_time_filter': full_list,
+                      'stdevtime_filter': stdev,'scans_used': scans})
+

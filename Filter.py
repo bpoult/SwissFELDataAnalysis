@@ -14,16 +14,15 @@ XASProData = PDC.XASProData()
 numstds = 4
 minIzero = 0.015
 lin_filter = 0.03
-minTime = 0.6
-maxTime = 0.7
+minTime = -5
+maxTime = 30
 
 
 def FilterData(xasrawdata, PlotOn, time_zero_mm):
     # numstds is the number of standard deviations to take from the median
     # minIzero sets the minimum permissable Izero
     # lin_filter sets upper and lower bounds for the filter
-    if time_zero_mm > 0:
-        xasrawdata = TimeCorrection(xasrawdata, time_zero_mm)
+    # if time_zero_mm > 0:
 
     FilterParameters = ['numstds:' + str(numstds) + ' minIzero:' + str(minIzero) + ' lin_filter:' + str(lin_filter),
                         'minTime: ' + str(minTime), 'maxTime: ' + str(maxTime)]
@@ -181,6 +180,7 @@ def FilterData(xasrawdata, PlotOn, time_zero_mm):
 
 
 def FilteringStuff(i, xasrawdata):
+    xasrawdata = TimeCorrection(xasrawdata, time_zero_mm)
     FilterParameters = ['numstds:' + str(numstds) + ' minIzero:' + str(minIzero) + ' lin_filter:' + str(lin_filter)]
     IzeroMedian = xasrawdata.IzeroMedian
     IzeroSTD = xasrawdata.IzeroSTD

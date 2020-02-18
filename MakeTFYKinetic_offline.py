@@ -8,6 +8,7 @@ import ProcessedDataClass as PDC
 import RawDataClass as RDC
 from scipy.special import erf
 from scipy.optimize import curve_fit
+from TimeCorrection import TimeCorrection
 
 
 def errfunc_sigma(x, a, b, c, d):
@@ -30,9 +31,9 @@ TotalShotsPumped = []
 TotalShotsUnpumped = []
 TFY_Difference = []
 
-scans = [37]
+scans = [3]
 
-scan_name = "RuDimerACN_timescan_0"
+scan_name = "RuDimerCl_timescan_0"
 # scan_name = "RuDimerACN_monoscan_10ps_0"
 # plt.figure()
 for i in range(0, len(scans)):
@@ -62,6 +63,7 @@ for i in range(0, len(scans)):
     if saveProData is True:
         with open(saveDir + "xasprodata.pkl", "wb") as f:
             time_zero_mm = 156.3276
+            xasrawdata = TimeCorrection(xasrawdata,time_zero_mm)
             xasprodata = FilterData(xasrawdata, False,time_zero_mm)
 
             delay_mm = np.empty(0)
@@ -98,6 +100,7 @@ for i in range(0, len(scans)):
         TotalShotsPumped[i][addVals] = xasprodata.shotspostfilterpump[variable]
         TotalShotsUnpumped[i][addVals] = xasprodata.shotspostfilterunpump[variable]
         TFY_Difference[i][addVals] = difference[variable]
+
     # plt.plot(ReferenceTime,TFY_Difference[i],label=i)
 # plt.legend()
 Energy = np.asarray(Energy)
@@ -110,7 +113,6 @@ UnPumpErrLow = np.asarray(UnPumpErrLow)
 TotalShotsPumped = np.asarray(TotalShotsPumped)
 TotalShotsUnpumped = np.asarray(TotalShotsUnpumped)
 TFY_Difference = np.asarray(TFY_Difference)
-
 # norm1 = np.trapz(TFYunpump[0][10:45])
 # norm2 = np.trapz(TFYunpump[1][10:45])
 # plt.figure()

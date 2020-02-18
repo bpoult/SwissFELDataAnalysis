@@ -16,13 +16,14 @@ ReferenceEnergy = [2852.0, 2851.0, 2850.0, 2849.0, 2848.0, 2847.0, 2846.5, 2846.
                        2837.5, 2837.25, 2837.0,
                        2836.75, 2836.5, 2836.25, 2836.0, 2835.75, 2835.5, 2835.25, 2835.0, 2834.5, 2834.0, 2833.0,
                        2832.0, 2831.0]
-scans = [3,5,8,10,13,15,16,17,18]
-base = "RuDimerACN_monoscan_10ps_0"
+# scans = [3,5,8,10,15,16,17,18]
+scans = [6,7,10,11,12,15,16,18,20]
+base = "RuDimerACN_monoscan_0p6ps_0"
 
 dirxas = "C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Processed/RuDimerACN/TFY" \
-         "/10ps/"
+         "/600fs/"
 dirrixs = "C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Processed/RuDimerACN" \
-          "/RIXS/10ps/"
+          "/RIXS/600fs/roi2/"
 
 with open('JF_Lalpha_Calibration.txt') as f:
     w = [float(x) for x in next(f).split()]  # read first line
@@ -32,14 +33,14 @@ with open('JF_Lalpha_Calibration.txt') as f:
 calibration = np.asarray(calibration)
 calibration = calibration.flatten()
 
-RIXS_on, RIXS_off, xasrawdata,herfd_pumped, herfd_unpumped,herfd_Difference = plotRIXS(scans, base, dirxas, dirrixs, False)
-plt.figure()
-plt.plot(ReferenceEnergy,herfd_pumped,label='Pumped')
-plt.plot(ReferenceEnergy,herfd_unpumped,label='UnPumped')
-plt.legend()
+# RIXS_on, RIXS_off, xasrawdata,herfd_pumped, herfd_unpumped,herfd_Difference = plotRIXS(scans, base, dirxas, dirrixs, False)
+# plt.figure()
+# plt.plot(ReferenceEnergy,herfd_pumped,label='Pumped')
+# plt.plot(ReferenceEnergy,herfd_unpumped,label='UnPumped')
+# plt.legend()
 
 plt.figure()
-plt.plot(ReferenceEnergy,herfd_Difference)
+plt.plot(ReferenceEnergy,herfd_pumped-herfd_unpumped)
 
 RIXS_on = np.ndarray.transpose(RIXS_on)
 RIXS_off = np.ndarray.transpose(RIXS_off)
@@ -58,11 +59,11 @@ RIXS_off = np.ndarray.transpose(RIXS_off)
 #     loss0 = xasrawdata.Energy[i] - calibration
 #     rixs0 = RIXS_on[:, i]
 #     rixsmap2[:, i] = np.interp(loss,loss0,rixs0, left=0, right=0)
-ElossMap_on, loss_on, mono_on = emiss2loss(RIXS_on, calibration, xasrawdata.Energy)
-ElossMap_off, loss_off, mono_off = emiss2loss(RIXS_off, calibration, xasrawdata.Energy)
+ElossMap_on, loss_on, mono_on = emiss2loss(RIXS_on, calibration, ReferenceEnergy)
+ElossMap_off, loss_off, mono_off = emiss2loss(RIXS_off, calibration, ReferenceEnergy)
 
 plt.figure()
-X, Y = np.meshgrid(xasrawdata.Energy, calibration)
+X, Y = np.meshgrid(ReferenceEnergy, calibration)
 plt.subplot(2, 1, 1)
 plt.pcolor(X, Y, RIXS_on, vmax=0.1)
 plt.colorbar()
@@ -72,7 +73,7 @@ plt.title('DimerACN RIXS pumped 10ps')
 plt.tight_layout()
 
 plt.figure()
-X, Y = np.meshgrid(xasrawdata.Energy, loss_on)
+X, Y = np.meshgrid(ReferenceEnergy, loss_on)
 plt.subplot(2, 1, 1)
 plt.pcolor(X, Y, ElossMap_on, vmax=0.1)
 plt.colorbar()
@@ -81,12 +82,13 @@ plt.ylabel('Energy Loss (eV)')
 plt.title('DimerACN RIXS pumped 600fs')
 plt.tight_layout()
 
-SaveThis = False
+SaveThis = True
 if SaveThis is True:
     rixsprodata = PDC.RIXSProData()
     rixsprodata.changeValue(Elosspumped=ElossMap_on, Elossunpumped=ElossMap_off, emissionAxis=calibration, lossAxis=loss_on)
 
-    sp.savemat('C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Dec-10-2019/RuDimerACN_RIXS_10ps.mat',
-               mdict= {'RIXSpumped_10ps':RIXS_on,'RIXSunpumped_10ps':RIXS_off,'Elosspumped_10ps':ElossMap_on, 'Elossunpumped_10ps':ElossMap_off, 'emissionAxis_10ps':calibration, 'lossAxis_10ps':loss_on,\
-                       'mono_10ps':xasrawdata.Energy})
+    sp.savemat('C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Feb-10-2020/RuDimerACN.mat',
+               mdict= {'RIXSpumped_600fs':RIXS_on,'RIXS':RIXS_off,'Elosspumped_600fs':ElossMap_on,
+                       'Elossunpumped_600fs':ElossMap_off, 'emission':calibration, 'lossAxis_600fs':loss_on,
+                       'x':ReferenceEnergy})
 
