@@ -11,11 +11,12 @@ from TimeCorrection import TimeCorrection
 import ProcessedDataClass as PDC
 
 XASProData = PDC.XASProData()
-numstds = 4
+numstds = 4.5
 minIzero = 0.015
-lin_filter = 0.03
-minTime = 0.6
-maxTime = 0.7
+lin_filter = 0.075
+JF_PIPS_lin_filter = 0.2
+minTime = 0.3
+maxTime = 12
 
 
 def FilterData(xasrawdata, PlotOn, time_zero_mm):
@@ -61,7 +62,13 @@ def FilterData(xasrawdata, PlotOn, time_zero_mm):
         PulseID_pump = xasrawdata.pulseIDs_pump[i]
         PulseID_unpump = xasrawdata.pulseIDs_unpump[i]
         time_delay_ps = xasrawdata.Tcorrected_pump[i]
-
+        
+#        DataFluo_pump = DataFluo_pump[IzeroFEL_pump>minIzero]
+#        DataFluo_unpump=DataFluo_unpump[IzeroFEL_unpump>minIzero]
+#        IzeroFEL_pump=IzeroFEL_pump[IzeroFEL_pump>minIzero]
+#        IzeroFEL_unpump=IzeroFEL_unpump[IzeroFEL_unpump>minIzero]
+#        time_delay_ps = time_delay_ps[IzeroFEL_pump>minIzero]
+        
         IzeroFEL_pump_raw_total = np.append(IzeroFEL_pump_raw_total, IzeroFEL_pump)
         IzeroFEL_unpump_raw_total = np.append(IzeroFEL_unpump_raw_total, IzeroFEL_unpump)
         DataFluo_pump_raw_total = np.append(DataFluo_pump_raw_total, DataFluo_pump)
@@ -188,7 +195,15 @@ def FilteringStuff(i, xasrawdata):
     DataFluo_unpump = xasrawdata.DataFluo_unpump_total[i]
     IzeroFEL_pump = xasrawdata.Izero_pump_total[i]
     IzeroFEL_unpump = xasrawdata.Izero_unpump_total[i]
+    time_delay_ps = xasrawdata.Tcorrected_pump[i]
 
+#    DataFluo_pump = DataFluo_pump[IzeroFEL_pump>minIzero]
+#    DataFluo_unpump=DataFluo_unpump[IzeroFEL_unpump>minIzero]
+#    IzeroFEL_pump=IzeroFEL_pump[IzeroFEL_pump>minIzero]
+#    IzeroFEL_unpump=IzeroFEL_unpump[IzeroFEL_unpump>minIzero]
+#    time_delay_ps = time_delay_ps[IzeroFEL_pump>minIzero]
+
+    
     linFit_pump = np.polyfit(IzeroFEL_pump, DataFluo_pump, 1)
     linFit_unpump = np.polyfit(IzeroFEL_unpump, DataFluo_unpump, 1)
 
@@ -207,14 +222,42 @@ def FilteringStuff(i, xasrawdata):
     conditionPumpMin = IzeroFEL_pump > IzeroMedian - numstds * IzeroSTD
     conditionPumpLow = IzeroFEL_pump > minIzero
 
+
     conditionUnPumpMax = IzeroFEL_unpump < IzeroMedian + numstds * IzeroSTD
     conditionUnPumpMin = IzeroFEL_unpump > IzeroMedian - numstds * IzeroSTD
     conditionUnPumpLow = IzeroFEL_unpump > minIzero
+    conditionTimePumpLow = time_delay_ps > minTime
+    conditionTimePumpHigh = time_delay_ps < maxTime
 
-    condIzeroPump = conditionPumpMax & conditionPumpMin & conditionPumpLow & conditionPumpLinHigh & conditionPumpLinLow
+
+    condIzeroPump = conditionPumpMax & conditionPumpMin & conditionPumpLow & conditionPumpLinHigh & conditionPumpLinLow & conditionTimePumpLow & conditionTimePumpHigh
     condIzeroUnPump = conditionUnPumpMax & conditionUnPumpMin & conditionUnPumpLow & conditionUnPumpLinHigh & conditionUnPumpLinLow
 
     condFinalPump = condLin_pump & condIzeroPump
     condFinalUnPump = condLin_unpump & condIzeroUnPump
 
     return condFinalPump, condFinalUnPump, FilterParameters
+
+def JF_PIPS_filter(images_on,images_off,xasrawdata,i):
+    JF_PIPS_parameters = ['JF_PIPS_LinParam: '+ str(JF_PIPS_lin_filter)]
+    DataFluo_pump = xasrawdata.DataFluo_pump_total[i]
+    DataFluo_unpump = xasrawdata.DataFluo_unpump_total[i]
+    JF_pumped = np.sum(np.sum(images_on,axis=2),axis=1)/(len(images_on[2])*len(images_on[1]))
+    JF_unpumped = np.sum(np.sum(images_off,axis=2),axis=1)/(len(images_off[2])*len(images_off[1]))
+
+    
+    linFit_pump = np.polyfit(JF_pumped, DataFluo_pump, 1)
+    linFit_unpump = np.polyfit(JF_unpumped, DataFluo_unpump, 1)
+    
+    cond_JF_PIPS_pump_high = DataFluo_pump < JF_pumped * linFit_pump[0] + linFit_pump[1] + JF_PIPS_lin_filter
+    cond_JF_PIPS_pump_low = DataFluo_pump > JF_pumped * linFit_pump[0] + linFit_pump[1] - JF_PIPS_lin_filter
+    
+    cond_JF_PIPS_unpump_high = DataFluo_unpump < JF_unpumped * linFit_unpump[0] + linFit_unpump[1] + JF_PIPS_lin_filter
+    cond_JF_PIPS_unpump_low = DataFluo_unpump > JF_unpumped * linFit_unpump[0] + linFit_unpump[1] - JF_PIPS_lin_filter
+
+    cond_JF_PIPS_pumped = cond_JF_PIPS_pump_high & cond_JF_PIPS_pump_low
+    cond_JF_PIPS_unpumped = cond_JF_PIPS_unpump_high & cond_JF_PIPS_unpump_low
+    
+    
+    
+    return cond_JF_PIPS_pumped, cond_JF_PIPS_unpumped, JF_PIPS_parameters
