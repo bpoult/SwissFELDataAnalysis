@@ -6,23 +6,11 @@ Created on Tue Oct  1 23:52:59 2019
 @author: ext-poulter_b
 """
 import sys
-sys.path.insert(0, '/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/jfut/')
-import jungfrau_utils as jf
-sys.path.insert(0, '/das/work/p17/p17983/')
+sys.path.append("..")
 import numpy as np
-import json
-import os
-import time
-from matplotlib import pyplot as plt
-from scipy.optimize import curve_fit
-import h5py
-from alvra_tools.load_data import *
-from alvra_tools.channels import *
-sys.path.insert(0, '/das/work/p17/p17983/SwissFEL19DA/')
-from built_functions import *
-from make_bar_stamp import make_bar_stamp
-from Filter import *
-sys.path.insert(0, '/das/work/p17/p17983/')
+from XES.load_JF import load_JF_cropped_data_pump
+from XES.make_bar_stamp import make_bar_stamp
+from common.Filter import Filtering
 
 def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
     image_threshold = 2
@@ -38,24 +26,12 @@ def get_xes_pumped(filename,xasrawdata, DIR, DIRBS, roi, ynstamp,ii):
         load_JF_cropped_data_pump(DIR + filename + ".JF02T09V02crop.h5", roi, 50, 50/2, nshots=None)
         
     
-#    _, _, _, _, JFIDs_pump, JFIDs_unpump, _, _ =load_PumpProbe_events(filename,channel_JF_pulse_ids)
-#    
-#
-#    
-#    idcheck = [a==b and c==d for a,b,c,d in zip(pulse_ids_on, JFIDs_pump, pulse_ids_off, JFIDs_unpump)]
-#    IDCheck = sum([int(x) for x in idcheck])
-#    
-#    if IDCheck:
-#        print("passed ID check")
-#    else:
-#        print("failed ID check")   
-    
     print('number of frames')
     print(images_on.shape[0])
     print(images_off.shape[0])
 
     
-    condFinalPump, condFinalUnPump,FilterParameters = FilteringStuff(ii,xasrawdata)
+    condFinalPump, condFinalUnPump,FilterParameters = Filtering(ii,xasrawdata)
 
     images_good_on = images_on
     images_good_off = images_off
