@@ -8,41 +8,32 @@ Created on Thu Aug 29 01:05:13 2019
 
 import sys
 sys.path.append("..")
-from load_PumpProbe_events_BIP import load_PumpProbe_events_BIP
+from load_PumpProbe_events import load_PumpProbe_events
 
-def LoadData(scan_name,XAS,XES):
+def LoadData(DIR_scan, DIR_json, scan_name, input_info):
     
-    import sys
-    sys.path.insert(0, '/das/work/p17/p17983/')
     import numpy as np
     import json
     import os
     import RawDataClass as RDC
 
-
-    if XAS:
-        DIR = "/sf/alvra/data/p17983/raw/scan_data/" + scan_name + "/"
-    if XES:
-        DIR = "/sf/alvra/data/p17983/raw/" + scan_name + "/"
-    DIR_json = "/sf/alvra/data/p17983/res/scan_info/"
     
     RawData = RDC.RawData()
+    
+    DIR = DIR_scan + scan_name + "/"
     print(DIR)
     json_file = DIR_json + scan_name + "_scan_info.json"
-    print (json_file)
-    if XAS is True:
+
+    if input_info is True:
         with open(json_file) as file:
             data = json.load(file)
             numFiles = len(data['scan_files'])
             looprange = range(0,numFiles)
-    if XES is True:
-        print("Lower File number bound? (XES)")
-        num_XES_lower = int(input())
-        print("Upper File number bound? (XES)")
-        num_XES_upper = int(input())
+    else:
+        num_XES_lower = input_info[0]
+        num_XES_upper = input_info[1]
         numFiles = num_XES_upper - num_XES_lower
         looprange = range(num_XES_lower,num_XES_upper)
-    print ("Processing",numFiles,"files")
     
     IzeroFEL_pump_original_total = []
     IzeroFEL_unpump_original_total = []
@@ -74,18 +65,17 @@ def LoadData(scan_name,XAS,XES):
     waveplate_total = np.empty(0)
     
     for i in looprange:
-#for i in range(0,1):
-        if XAS is True:
+        if input_info is True:
             filename = str(data['scan_files'][i][0])
-        if XES is True:
-            filename = 'run_000' + '%02d' %i +'.BSREAD.h5'
-            print(filename)
-        filename = DIR + os.path.basename(filename)
+        else:
+            filename = DIR + 'run_000' + '%02d' %i +'.BSREAD.h5'
+        print('filename')
+        print(filename)
         exists = os.path.isfile(filename)
         if not exists:
             print("No such file")
         elif exists: 
-#         print("step",i+1,"of",numFiles,": Processing %s" %(str(data['scan_files'][i][0])))
+
 
             (DataFluo_pump, DataFluo_unpump, IzeroFEL_pump, IzeroFEL_unpump,\
              Izero2_pump, Izero2_unpump, Izero3_pump,Izero3_unpump,Izero4_pump,Izero4_unpump,\
@@ -93,7 +83,7 @@ def LoadData(scan_name,XAS,XES):
              Laser_Diode_pump, Laser_refDiode_pump,Laser_diag_pump, PALM_pump, PALM_unpump,\
              PALM_eTOF_pump,PALM_eTOF_unpump,PALM_drift_pump, PALM_drift_unpump, BAM_pump,\
              BAM_unpump, waveplate, Energy) = \
-            load_PumpProbe_events_BIP(filename)
+            load_PumpProbe_events(filename)
             
             IzeroFEL_pump_original_total.append(IzeroFEL_pump.T[0])
             IzeroFEL_unpump_original_total.append(IzeroFEL_unpump.T[0])

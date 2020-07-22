@@ -5,9 +5,8 @@ Created on Fri Sep 27 22:40:56 2019
 
 @author: ext-poulter_b
 """
-import sys
-sys.path.insert(0, '/das/work/p17/p17983/')
-from alvra_tools.channels import *
+
+from common.channels import *
 import h5py
 import numpy as np
 
@@ -18,7 +17,7 @@ def _get_data(f):
     else:
         return f
 
-def load_PumpProbe_events_BIP(filename, nshots=None):
+def load_PumpProbe_events(filename, nshots=None):
     with h5py.File(filename, 'r') as BS_file:
 
         BS_file = _get_data(BS_file)

@@ -1,6 +1,6 @@
 import os
 import logging
-from .cfgfile import ConfigFile
+from cfgfile import ConfigFile
 #import a_module
 
 directory = os.getcwd()
@@ -9,9 +9,9 @@ folder = directory.split('/')
 if folder[-1] == 'RIXS' or folder[-1] == 'XES':
     DEFAULT_FNAME = '/'.join(folder[:-1]) + '/common/channels.ini'
 elif folder[-1] == 'common':
-    DEFAULT_NAME = '/'.join(folder) + '/channels.ini'
+    DEFAULT_FNAME = '/'.join(folder) + '/channels.ini'
 else:
-    DEFAULT_NAME = '/'.join(folder) + '/common/channels.ini'
+    DEFAULT_FNAME = '/'.join(folder) + '/common/channels.ini'
 
 
 log = logging.getLogger()
