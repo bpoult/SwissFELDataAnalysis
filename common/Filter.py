@@ -8,7 +8,7 @@ Created on Thu Sep  5 21:07:23 2019
 import sys
 sys.path.append("..")
 import numpy as np
-import common.ProcessedDataClass as PDC
+import ProcessedDataClass as PDC
 
 XASProData = PDC.XASProData()
 numstds = 4.5
@@ -27,7 +27,7 @@ def Filtering(ii, rawdata):
     DataFluo_unpump = rawdata.DataFluo_unpump_total[ii]
     IzeroFEL_pump = rawdata.Izero_pump_total[ii]
     IzeroFEL_unpump = rawdata.Izero_unpump_total[ii]
-    time_delay_ps = rawdata.Tcorrected_pump[ii]
+    #time_delay_ps = rawdata.Tcorrected_pump[ii]
     
     linFit_pump = np.polyfit(IzeroFEL_pump, DataFluo_pump, 1)
     linFit_unpump = np.polyfit(IzeroFEL_unpump, DataFluo_unpump, 1)
@@ -51,11 +51,11 @@ def Filtering(ii, rawdata):
     conditionUnPumpMax = IzeroFEL_unpump < IzeroMedian + numstds * IzeroSTD
     conditionUnPumpMin = IzeroFEL_unpump > IzeroMedian - numstds * IzeroSTD
     conditionUnPumpLow = IzeroFEL_unpump > minIzero
-    conditionTimePumpLow = time_delay_ps > minTime
-    conditionTimePumpHigh = time_delay_ps < maxTime
+    #conditionTimePumpLow = time_delay_ps > minTime
+    #conditionTimePumpHigh = time_delay_ps < maxTime
 
 
-    condIzeroPump = conditionPumpMax & conditionPumpMin & conditionPumpLow & conditionPumpLinHigh & conditionPumpLinLow & conditionTimePumpLow & conditionTimePumpHigh
+    condIzeroPump = conditionPumpMax & conditionPumpMin & conditionPumpLow & conditionPumpLinHigh & conditionPumpLinLow
     condIzeroUnPump = conditionUnPumpMax & conditionUnPumpMin & conditionUnPumpLow & conditionUnPumpLinHigh & conditionUnPumpLinLow
 
     condFinalPump = condLin_pump & condIzeroPump

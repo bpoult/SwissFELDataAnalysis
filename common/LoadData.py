@@ -6,23 +6,25 @@ Created on Thu Aug 29 01:05:13 2019
 @author: ext-poulter_b
 """
 
-import sys
-sys.path.append("..")
-from load_PumpProbe_events import load_PumpProbe_events
 
-def LoadData(DIR_scan, DIR_json, scan_name, input_info):
+from .load_PumpProbe_events import load_PumpProbe_events
+import pickle
+import os
+import numpy as np
+import json
+import os
+from RawDataClass import RawData as RDC
+
+def load_data(scan_DIR, json_DIR, scan_name, input_info, save_DIR):
     
-    import numpy as np
-    import json
-    import os
-    import RawDataClass as RDC
+
 
     
-    RawData = RDC.RawData()
+    RawData = RDC()
     
-    DIR = DIR_scan + scan_name + "/"
+    DIR = scan_DIR + scan_name + "/"
     print(DIR)
-    json_file = DIR_json + scan_name + "_scan_info.json"
+    json_file = json_DIR + scan_name + "_scan_info.json"
 
     if input_info is True:
         with open(json_file) as file:
@@ -162,6 +164,19 @@ def LoadData(DIR_scan, DIR_json, scan_name, input_info):
                            BAM_pump=BAM_pump_total,\
                            BAM_unpump=BAM_unpump_total,\
                            waveplate=waveplate_total)
+    RawData.file = DIR
+    RawData.jsonfile = json_DIR
+    
+    if not os.path.isdir(save_DIR + scan_name):
+        try:
+            os.mkdir(save_DIR + scan_name)
+        except:
+            os.mkdir(save_DIR)
+            os.mkdir(save_DIR + scan_name)
+            
+    
+    with open(save_DIR + scan_name + '/' + "rawdata.pkl", "wb") as f:
+        pickle.dump(RawData, f)
     
     return RawData
         

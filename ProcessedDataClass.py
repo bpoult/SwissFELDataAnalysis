@@ -8,13 +8,13 @@ Created on Thu Sep  5 20:39:35 2019
 
 
 class XASProData:
-    _defaults = "Izero_pump_total", \
+    _defaults = ("Izero_pump_total", \
                 "Izero_unpump_total", \
                 "DataFluo_pump_total", \
                 "DataFluo_unpump_total", \
                 "IzeroMedian", \
                 "IzeroSTD", \
-                "Energy", "delays"
+                "Energy", "delays")
 
     _default_value = None
 
@@ -24,11 +24,14 @@ class XASProData:
 
     def changeValue(self, **kwargs):
         self.__dict__.update(kwargs)
+        
+    def getKeys(self):
+        print(self.__dict__.keys())
 
 
 class RIXSProData:
-    _defaults = "RIXS_map_pumped", "RIXS_map_unpumped", \
-                "Emission_vs_Time_pumped", "Emission_vs_Time_unpumped"
+    _defaults = ("RIXS_map_pumped", "RIXS_map_unpumped", \
+                "FilterParameters", "Energy")
 
     _default_value = None
 
@@ -38,16 +41,24 @@ class RIXSProData:
 
     def changeValue(self, **kwargs):
         self.__dict__.update(kwargs)
+        
+    def getKeys(self):
+        print(self.__dict__.keys())
+        
+    def plot(self, name):
+        from RIXS import PlotRIXS
+        
+        PlotRIXS.plotRIXS(self, name)
 
 
 class XASAveraged:
-    _defaults = "Averaged_Spectrum_pumped",\
+    _defaults = ("Averaged_Spectrum_pumped",\
                 "Averaged_Spectrum_unpumped",\
                 "Scans_in_average",\
                 "Shots_Per_Point_pumped",\
                 "Shots_Per_Point_unpumped",\
                 "Energy",\
-                "Difference_Spectrum"
+                "Difference_Spectrum")
 
     _default_value = None
 
@@ -57,3 +68,6 @@ class XASAveraged:
 
     def changeValue(self, **kwargs):
         self.__dict__.update(kwargs)
+        
+    def getKeys(self):
+        print(self.__dict__.keys())

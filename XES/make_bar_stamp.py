@@ -21,10 +21,5 @@ def make_bar_stamp(dimension_x, dimension_y):
 
     condition = np.logical_not(np.logical_and(X<200, X>130))
     Z[condition] = 0
-
-    #plt.figure()
-    #plt.imshow(Z)
-    
-    #plt.colorbar()
     
     return Z

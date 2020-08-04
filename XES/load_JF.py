@@ -26,8 +26,6 @@ def _make_reprates_on_off(pulse_ids, reprate_FEL, reprate_laser):
 
 def load_JF_cropped_data_pump(fname, roi, reprate_FEL, reprate_laser, nshots=None):
     with h5py.File(fname, "r") as f:
-
-        print(f"images_roi{roi}")
         
         pulse_ids = f[f"pulse_ids"][:nshots]
         images    = f[f"images_roi{roi}"][:nshots]

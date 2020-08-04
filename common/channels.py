@@ -1,6 +1,6 @@
 import os
 import logging
-from cfgfile import ConfigFile
+from .cfgfile import ConfigFile
 #import a_module
 
 directory = os.getcwd()
