@@ -5,21 +5,12 @@ Created on Thu Sep  5 21:07:23 2019
 
 @author: ext-poulter_b
 """
-import sys
-sys.path.append("..")
 import numpy as np
-import ProcessedDataClass as PDC
-
-XASProData = PDC.XASProData()
-numstds = 4.5
-minIzero = 0.01
-lin_filter = 0.025
-JF_PIPS_lin_filter = 0.8
-minTime = 0.3
-maxTime = 12
 
 
-def Filtering(ii, rawdata):
+
+
+def Filtering(ii, rawdata, numstds=4.5, minIzero=0.01, lin_filter=0.025, minTime=0.3, maxTime=12):
     FilterParameters = ['numstds:' + str(numstds) + ' minIzero:' + str(minIzero) + ' lin_filter:' + str(lin_filter)]
     IzeroMedian = rawdata.IzeroMedian
     IzeroSTD = rawdata.IzeroSTD
@@ -61,9 +52,9 @@ def Filtering(ii, rawdata):
     condFinalPump = condLin_pump & condIzeroPump
     condFinalUnPump = condLin_unpump & condIzeroUnPump
 
-    return condFinalPump, condFinalUnPump, FilterParameters
+    return condFinalPump, condFinalUnPump, FilterParameters, IzeroFEL_pump, IzeroFEL_unpump
 
-def JF_PIPS_filter(images_on,images_off,rawdata,i):
+def JF_PIPS_filter(images_on,images_off,rawdata,i, JF_PIPS_lin_filter=0.8):
     JF_PIPS_parameters = ['JF_PIPS_LinParam: '+ str(JF_PIPS_lin_filter)]
     DataFluo_pump = rawdata.DataFluo_pump_total[i]
     DataFluo_unpump = rawdata.DataFluo_unpump_total[i]

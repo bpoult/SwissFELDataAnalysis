@@ -50,28 +50,37 @@ def findvmax(RIXS_map_on, RIXS_map_off):
 
 
 
-def plotRIXS(pro_data, name):
+def plotRIXS(pro_data, name, energy_cut, JF_cut):
     
     import matplotlib.pyplot as plt
    
-    cmap_alt = makeColorMap('viridis', .5)
+    cmap_alt = makeColorMap('viridis', .4)
     
     min_in, max_in = findJFLimits(pro_data.RIXS_map_pumped)
     RIXS_max = findvmax(pro_data.RIXS_map_pumped, pro_data.RIXS_map_unpumped)
     
     
+    JF_pixel = np.linspace(0,max_in-min_in-1,max_in-min_in)
+    
     plt.figure(figsize = (8,6))    
-    X,Y = np.meshgrid(np.linspace(0,max_in-min_in-1,max_in-min_in),pro_data.Energy)
+    X,Y = np.meshgrid(JF_pixel,pro_data.Energy)
+    
+    RIXS_on = pro_data.RIXS_map_pumped[:,min_in: max_in]
+    RIXS_off = pro_data.RIXS_map_unpumped[:,min_in: max_in]
+    
+    if "RIXS_map_pumped_err" in pro_data.getKeys():
+        RIXS_on_err = pro_data.RIXS_map_pumped_err[:,min_in:max_in]
+        RIXS_off_err = pro_data.RIXS_map_unpumped_err[:,min_in:max_in]
+    
     plt.subplot(2,1,1)
-    plt.pcolor(X,Y,pro_data.RIXS_map_pumped[:,min_in: max_in], cmap = cmap_alt, vmax = RIXS_max)
+    plt.pcolor(X,Y,RIXS_on, cmap = cmap_alt, vmax = RIXS_max)
     plt.colorbar()
     plt.xlabel('JF pixel')
     plt.ylabel('Mono Energy (eV)')
     plt.title(str(name) + ' on')
     
-    X,Y = np.meshgrid(np.linspace(0,max_in-min_in-1,max_in-min_in),pro_data.Energy)
     plt.subplot(2,1,2)
-    plt.pcolor(X,Y,pro_data.RIXS_map_unpumped[:,min_in: max_in], cmap = cmap_alt, vmax = RIXS_max)
+    plt.pcolor(X,Y,RIXS_off, cmap = cmap_alt, vmax = RIXS_max)
     plt.colorbar()
     plt.xlabel('JF pixel')
     plt.ylabel('Mono Energy (eV)')
@@ -79,10 +88,71 @@ def plotRIXS(pro_data, name):
     plt.tight_layout()
     
     
-    #ax = sns.heatmap(X, Y, pro_data.RIXS_map_pumped)
+    
+    
+    energy_slice_cond = (pro_data.Energy > energy_cut[0]) & (pro_data.Energy < energy_cut[1])
+    pixel_slice_cond = (JF_pixel > JF_cut[0]) & (JF_pixel < JF_cut[1])
+    
+    energy_slice_on = np.mean(RIXS_on[energy_slice_cond, :], 0)
+    energy_slice_off = np.mean(RIXS_off[energy_slice_cond, :], 0)
+    
+    pixel_slice_on = np.mean(RIXS_on[:, pixel_slice_cond], 1)
+    pixel_slice_off = np.mean(RIXS_off[:, pixel_slice_cond], 1)
+    
+    if "RIXS_map_pumped_err" in pro_data.getKeys():
+        
+        energy_slice_on_err = RIXS_on_err[energy_slice_cond, :]
+        energy_slice_off_err = RIXS_off_err[energy_slice_cond, :]
+        pixel_slice_on_err = RIXS_on_err[:, pixel_slice_cond]
+        pixel_slice_off_err = RIXS_off_err[:, pixel_slice_cond]
+        
+        energy_slice_on_err = np.sqrt(np.mean(energy_slice_on_err**2, 0))
+        energy_slice_off_err = np.sqrt(np.mean(energy_slice_off_err**2, 0))
+        pixel_slice_on_err = np.sqrt(np.mean(pixel_slice_on_err**2, 1))
+        pixel_slice_off_err = np.sqrt(np.mean(pixel_slice_off_err**2, 1))
 
-#plt.figure()
-#x = np.linspace(0,RIXS_on_01.shape[1],RIXS_on_01.shape[1])
-#plt.plot(x,rixsprodata.RIXS_map_pumped[21,:])
-#plt.plot(x,rixsprodata.RIXS_map_unpumped[21,:])
-#plt.show()
+
+    plt.figure()
+    
+    if "RIXS_map_pumped_err" in pro_data.getKeys():
+        plt.errorbar(pro_data.Energy, pixel_slice_on, pixel_slice_on_err, label = 'on')
+        plt.errorbar(pro_data.Energy, pixel_slice_off, pixel_slice_off_err, label = 'off')
+    
+    else:
+        plt.plot(pro_data.Energy, pixel_slice_on, label = 'on')
+        plt.plot(pro_data.Energy, pixel_slice_off, label = 'off')
+        
+    plt.xlabel('Mono Energy (eV)')
+    plt.title(str(name) + ', pixel range ' + str(JF_cut[0]) + ' to ' + str(JF_cut[1]))
+    plt.legend()
+
+    
+    plt.figure()
+    
+    if "RIXS_map_pumped_err" in pro_data.getKeys():
+        plt.errorbar(JF_pixel, energy_slice_on, energy_slice_on_err, label = 'on')
+        plt.errorbar(JF_pixel, energy_slice_off, energy_slice_off_err, label = 'on')
+    
+    else:
+        plt.plot(JF_pixel, energy_slice_on, label = 'on')
+        plt.plot(JF_pixel, energy_slice_off, label = 'off')
+
+    plt.xlabel('JF pixel')
+    plt.title(str(name) + ', energy range ' + str(energy_cut[0]) + ' to ' + str(energy_cut[1]))
+    plt.legend()
+    
+    
+    """
+    plt.figure()
+    plt.plot(pro_data.Energy, pro_data.TFY_on, label = 'on')
+    plt.plot(pro_data.Energy, pro_data.TFY_off, label = 'off')
+    plt.title('TFY')
+    """
+    
+    
+    
+    
+    
+    
+    
+    

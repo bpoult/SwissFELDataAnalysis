@@ -50,12 +50,12 @@ class RawData:
         self.__dict__.update(kwargs)
         
     def getKeys(self):
-        print(self.__dict__.keys())
+        return self.__dict__.keys()
         
-    def makeRIXS(self, cropped_DIR, BS_DIR, save_DIR, name, roi):
+    def makeRIXS(self, cropped_DIR, BS_DIR, save_DIR, name, roi, numstds=4.5, minIzero=0.01, lin_filter=0.025, boot_choice = False, boot_number = 10):
         
         from RIXS import MakeRIXS
-        rixsprodata = MakeRIXS.makeRIXS(self, cropped_DIR, BS_DIR, save_DIR, name, roi)
+        rixsprodata = MakeRIXS.makeRIXS(self, cropped_DIR, BS_DIR, save_DIR, name, roi, numstds, minIzero, lin_filter, boot_choice, boot_number)
         
         return rixsprodata
     

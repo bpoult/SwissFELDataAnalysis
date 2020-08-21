@@ -26,12 +26,12 @@ class XASProData:
         self.__dict__.update(kwargs)
         
     def getKeys(self):
-        print(self.__dict__.keys())
+        return self.__dict__.keys()
 
 
 class RIXSProData:
     _defaults = ("RIXS_map_pumped", "RIXS_map_unpumped", \
-                "FilterParameters", "Energy")
+                "FilterParameters", "Energy", "TFY_on", "TFY_off")
 
     _default_value = None
 
@@ -43,12 +43,47 @@ class RIXSProData:
         self.__dict__.update(kwargs)
         
     def getKeys(self):
-        print(self.__dict__.keys())
+        return self.__dict__.keys()
         
-    def plot(self, name):
+    def plot(self, name, energy_cut, JF_cut):
         from RIXS import PlotRIXS
         
-        PlotRIXS.plotRIXS(self, name)
+        PlotRIXS.plotRIXS(self, name, energy_cut, JF_cut)
+        
+    def combine(self, prodata):
+        
+        if (self.RIXS_map_pumped is None):
+            print('none detected')
+            
+            self.RIXS_map_pumped = prodata.RIXS_map_pumped
+            self.RIXS_map_unpumped = prodata.RIXS_map_unpumped
+            self.FilterParameters = prodata.FilterParameters
+            self.Energy = prodata.Energy
+            #self.TFY_on = prodata.TFY_on
+            #self.TFY_off = prodata.TFY_off
+            
+            if 'RIXS_map_pumped_err' in list(prodata.getKeys()):
+                self.RIXS_map_pumped_err = prodata.RIXS_map_pumped_err**2
+                self.RIXS_map_unpumped_err = prodata.RIXS_map_unpumped_err**2
+            
+        else:
+            print('good to go')
+            print(self.RIXS_map_pumped.shape)
+            print(prodata.RIXS_map_pumped.shape)
+            self.RIXS_map_pumped = self.RIXS_map_pumped + prodata.RIXS_map_pumped
+            self.RIXS_map_unpumped = self.RIXS_map_unpumped + prodata.RIXS_map_unpumped
+            #self.TFY_on = self.TFY_on + prodata.TFY_on
+            #self.TFY_off = self.TFY_off + prodata.TFY_off
+            
+            if 'RIXS_map_pumped_err' in list(self.getKeys()):
+                self.RIXS_map_pumped_err = self.RIXS_map_pumped_err + prodata.RIXS_map_pumped_err**2
+                self.RIXS_map_unpumped_err = self.RIXS_map_unpumped_err + prodata.RIXS_map_unpumped_err**2
+            
+            if not(self.FilterParameters == prodata.FilterParameters):
+                print('You are attempting to combine processed data with different filter parameters')
+                
+            if not((self.Energy == prodata.Energy).all()):
+                print('You are attempting to combine processed data with different monoenergy scans')
 
 
 class XASAveraged:
@@ -70,4 +105,4 @@ class XASAveraged:
         self.__dict__.update(kwargs)
         
     def getKeys(self):
-        print(self.__dict__.keys())
+        return self.__dict__.keys()
