@@ -30,7 +30,9 @@ def findJFLimits(RIXS_map):
     
     energy_sum = np.sum(RIXS_map,0)
     non_zeros = energy_sum > 0
-    indicies = np.linspace(0,RIXS_map.shape[0],RIXS_map.shape[1]+1)
+    indicies = np.linspace(0,RIXS_map.shape[1],RIXS_map.shape[1]+1)
+    indicies = np.linspace(0,RIXS_map.shape[1],RIXS_map.shape[1]+1)
+
     indicies = indicies[non_zeros]
     
     return (int(indicies[0]), int(indicies[-1]))

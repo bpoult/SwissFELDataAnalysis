@@ -14,7 +14,8 @@ import ProcessedDataClass as PDC
 
 
 def makeRIXS(rawdata,input_info, cropped_DIR, BS_DIR, save_DIR, name, roi, numstds=4.5, minIzero=0.01, lin_filter=0.025, boot_choice = False, boot_number = 10):
-    
+    XES_on_2d_array= []
+    XES_off_2d_array = []
     rixsprodata = PDC.RIXSProData()
     
     BS_DIR = BS_DIR + name + "/"
@@ -39,28 +40,32 @@ def makeRIXS(rawdata,input_info, cropped_DIR, BS_DIR, save_DIR, name, roi, numst
             print(filename_base + '%02d' % (ii))
             print(cropped_DIR)
             if boot_choice:
-                        XES_on, XES_off, XES_on_err, XES_off_err, TFY_on, TFY_off, FilterParameters = \
+                        XES_on, XES_off, XES_on_err, XES_off_err,XES_on_2d,XES_off_2d, TFY_on, TFY_off, FilterParameters = \
                             get_xes_pumped(filename_base + '%02d' % (ii), rawdata, cropped_DIR, BS_DIR, roi, True, ii, numstds, minIzero, lin_filter, boot_choice, boot_number)
                         
             else:
-                XES_on, XES_off, TFY_on, TFY_off, FilterParameters = \
+                XES_on, XES_off, TFY_on, TFY_off, FilterParameters, XES_on_2d, XES_off_2d = \
                     get_xes_pumped(filename_base + '%02d' % (ii), rawdata, cropped_DIR, BS_DIR, roi, True, ii, numstds, minIzero, lin_filter, boot_choice)
 
         else:
             print(filename_base + '%02d' % (input_info[ii+0]))
 
             if boot_choice:
-                XES_on, XES_off, XES_on_err, XES_off_err, TFY_on, TFY_off, FilterParameters = \
+                XES_on, XES_off, XES_on_err, XES_off_err,XES_on_2d,XES_off_2d, TFY_on, TFY_off, FilterParameters = \
                     get_xes_pumped(filename_base + '%02d' % (input_info[ii+0]), rawdata, cropped_DIR, BS_DIR, roi, True, ii, numstds, minIzero, lin_filter, boot_choice, boot_number)
                 
             else:
-                XES_on, XES_off, TFY_on, TFY_off, FilterParameters = \
+                XES_on, XES_off, TFY_on, TFY_off, FilterParameters, XES_on_2d, XES_off_2d = \
                     get_xes_pumped(filename_base + '%02d' % (input_info[ii+0]), rawdata, cropped_DIR, BS_DIR, roi, True, ii, numstds, minIzero, lin_filter, boot_choice)
 
 
         if ii == 0:
             rixs_on = XES_on
             rixs_off = XES_off
+            tfy_on = TFY_on
+            tfy_off = TFY_off
+            XES_on_2d_array.append(XES_on_2d)
+            XES_off_2d_array.append(XES_off_2d)
             
             if boot_choice:
                 rixs_on_err = XES_on_err
@@ -68,18 +73,24 @@ def makeRIXS(rawdata,input_info, cropped_DIR, BS_DIR, save_DIR, name, roi, numst
         else:
             rixs_on = np.vstack((rixs_on, XES_on))
             rixs_off = np.vstack((rixs_off, XES_off))
+            tfy_on = np.append(tfy_on,TFY_on)
+            tfy_off = np.append(tfy_off,TFY_off)
             
+            XES_on_2d_array.append(XES_on_2d)
+            XES_off_2d_array.append(XES_off_2d)
+
             if boot_choice:
                 rixs_on_err = np.vstack((rixs_on_err, XES_on_err))
                 rixs_off_err = np.vstack((rixs_off_err, XES_off_err))
         
     if boot_choice:
         rixsprodata.changeValue(RIXS_map_pumped = rixs_on, RIXS_map_unpumped = rixs_off, FilterParameters = FilterParameters, \
-                            Energy = np.round(rawdata.Energy,1), RIXS_map_pumped_err = rixs_on_err, RIXS_map_unpumped_err = rixs_off_err, TFY_on = TFY_on, TFY_off = TFY_off)
+                            Energy = np.round(rawdata.Energy,1), RIXS_map_pumped_err = rixs_on_err, RIXS_map_unpumped_err = rixs_off_err,\
+                            XES_on_2d_array=np.asarray(XES_on_2d_array),XES_off_2d_array=np.asarray(XES_off_2d_array),TFY_on = TFY_on, TFY_off = TFY_off)
         
     else:
         rixsprodata.changeValue(RIXS_map_pumped = rixs_on, RIXS_map_unpumped = rixs_off, FilterParameters = FilterParameters, Energy = np.round(rawdata.Energy,1), \
-                                TFY_on = TFY_on, TFY_off = TFY_off)
+                                TFY_on = tfy_on, TFY_off = tfy_off,XES_on_2d_array=np.asarray(XES_on_2d_array),XES_off_2d_array=np.asarray(XES_off_2d_array))
     
     rixsprodata.croppedfile = cropped_DIR
     rixsprodata.bsfile = BS_DIR

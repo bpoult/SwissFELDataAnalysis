@@ -14,15 +14,15 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 
-name_base = "RuDimerCl_monoscan_0p6ps_"
-#name_base = "RuDimerACN_monoscan_10ps_"
+#name_base = "RuDimerCl_monoscan_0p6ps_"
+name_base = "RuDimerACN_monoscan_10ps_"
 #name_base = "RuDimerACN_monoscan_0p6ps_"
-#name_base = "XES_RuDimerCl_2842.0eV_10ps"
+#name_base = "XES_2842.0eV_10ps"
 #name_base = "RuBpy3_monoscan_"
 
-name_numbers = [1,2,3,4,5,6,7,8,10,11,12]
-#name_numbers = [2,3,4,5,8,10,12,13,14,15,16,17,18]
-#name_numbers = [16,17,18,20]
+#name_numbers = [1,2,3,4,5,6,7,8,10,11,12]
+name_numbers = [3,4,5,8,10,12,13,14,15,16,17,18]
+#name_numbers = [6,7,9,10,11,12,16,17,18,20] # Remember to do 15
 #name_numbers = [10,11,14]
 
 # Use these for RIXS
@@ -37,16 +37,17 @@ BS_DIR = "/sf/alvra/data/p17983/raw/scan_data/"
 #scan_DIR = "/sf/alvra/data/p17983/raw/"
 
 #save_DIR = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Chelsea/Data/RuCl/"
-save_DIR = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/Bootstrapped/RIXS/RuDimerCl_600fs/"
+#save_DIR = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/Bootstrapped/RIXS/RuDimerCl_600fs/"
 #save_DIR = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Chelsea/Data/RuACN/"
-#save_DIR = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Chelsea/Data/RuBpy3/"
+#save_DIR = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/JF_corrected/RuDimerACN/RIXS/600fs/"
+save_DIR = "/das/work/p17/p17983/SwissFEL19DA/PostExperiment/Ben/Processed/JF_corrected/RuDimerACN/RIXS/10ps/"
 
 input_info = True #set to True if it is energy scan, set to array of file numbers if it is an emission scan
-#input_info = list(range(548,619))
+#input_info = list(range(481,501)) + list(range(868,906))
 roi = 2
 #name_numbers = [0];
 
-reload_raw = False
+reload_raw = True
 reload_pro = True
 
 #Filter settings
@@ -55,7 +56,7 @@ minIzero = 0.01
 lin_filter = 0.025
 
 #Boot
-boot_choice = True
+boot_choice = False
 boot_number = 50
 
 #Combine
@@ -138,7 +139,7 @@ print('___________________________________________________________')
 
 strname = [f'{x:03}' for x in name_numbers]
 
-pro_data.plot(name_base + ' ,'.join(strname),[2838,2842],[25,45])
+pro_data.plot(name_base + ' ,'.join(strname),[2838,2842],[0,300])
 
 print('end time')
 
