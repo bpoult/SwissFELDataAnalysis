@@ -145,11 +145,3 @@ save = True
 XASAveraged = PDC.XASAveraged()
 XASAveraged.changeValue(Averaged_Spectrum_unpumped=TFYunpump, Scans_in_average=scans,
                         Shots_Per_Point_unpumped=TotalShotsUnpumped, Energy=Energy)
-if save:
-    with open(Dir + "Pumped_Averaged_600fs.pkl", "wb") as f:
-        pickle.dump(XASAveraged, f)
-    sp.savemat('C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Jan-16-2020/DimerACN/DifferenceSpectra_time_filter.mat',
-               mdict={'pumped':TFYpump,'Difference_time_filter': TFY_Difference, 'TotalShots_time_filter': TotalShotsPumped,
-                      'TotalShots_time_filter': TotalShotsUnpumped,'Energy': Energy,'All_Scans_time_filter': full_list,
-                      'stdevtime_filter': stdev,'scans_used': scans})
-

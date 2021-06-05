@@ -82,13 +82,3 @@ plt.ylabel('Energy Loss (eV)')
 plt.title('DimerACN RIXS pumped 600fs')
 plt.tight_layout()
 
-SaveThis = True
-if SaveThis is True:
-    rixsprodata = PDC.RIXSProData()
-    rixsprodata.changeValue(Elosspumped=ElossMap_on, Elossunpumped=ElossMap_off, emissionAxis=calibration, lossAxis=loss_on)
-
-    sp.savemat('C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Feb-10-2020/RuDimerACN.mat',
-               mdict= {'RIXSpumped_600fs':RIXS_on,'RIXS':RIXS_off,'Elosspumped_600fs':ElossMap_on,
-                       'Elossunpumped_600fs':ElossMap_off, 'emission':calibration, 'lossAxis_600fs':loss_on,
-                       'x':ReferenceEnergy})
-

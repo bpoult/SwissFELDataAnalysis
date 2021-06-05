@@ -42,10 +42,3 @@ plt.plot(calibration, XES_on)
 plt.plot(calibration, XES_off)
 plt.figure()
 plt.plot(XES_on-XES_off)
-
-SaveThis = True
-if SaveThis is True:
-    sp.savemat(
-        'C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Feb-12-2020/RuDimerACN_XES_2842.0eV_10ps.mat',
-        mdict={'XES_on_10ps': XES_on, 'XES_off_10ps': XES_off, 'XES_diff_10ps': XES_Difference,
-               'emissionAxis': calibration, 'stdev_on_10ps': std_on, 'stdev_off_10ps': std_off, 'num_scans_10ps':num_scans})

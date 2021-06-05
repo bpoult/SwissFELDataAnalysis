@@ -168,10 +168,4 @@ save = True
 XASAveraged = PDC.XASAveraged()
 XASAveraged.changeValue(Averaged_Spectrum_unpumped=TFYunpump, Scans_in_average=scans,
                         Shots_Per_Point_unpumped=TotalShotsUnpumped, Energy=Energy)
-if save:
-    with open(Dir + "Pumped_Averaged_600fs.pkl", "wb") as f:
-        pickle.dump(XASAveraged, f)
-    sp.savemat('C:/Users/poult/Documents/Research/Beamtimes/SwissFEL_July_2019/Transfered_Data/Dec-06-2019/DimerACN/Kinetic_Trace_2842.0eV.mat',
-               mdict={'Kinetic_Trace_C': TFY_Difference, 'TotalShots_pumped_C': TotalShotsPumped,
-                      'TotalShots_unpumped_C': TotalShotsUnpumped,'All_Scans_C': full_list,'Times':ReferenceTime})
-#
+
