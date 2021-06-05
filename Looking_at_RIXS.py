@@ -25,22 +25,26 @@ def plotRIXS(scans, base, dirxas, dirrixs, ploton):
                        2836.75, 2836.5, 2836.25, 2836.0, 2835.75, 2835.5, 2835.25, 2835.0, 2834.5, 2834.0, 2833.0,
                        2832.0, 2831.0]
     Energy = ReferenceEnergy
-    plt.figure()
+    # plt.figure()
+    xes_on = []
+    xes_off = []
     for i in range(0, len(scans)):
         basename = base + '%02d/' % scans[i]
-        with open(dirxas + basename + "xasrawdata.pkl", "rb") as f:
+        with open(dirxas + basename + "rawdata.pkl", "rb") as f:
             xasrawdata = pickle.load(f)
-        with open(dirrixs + basename + "rixsprodata.pkl", "rb") as f:
+        with open(dirrixs + basename + "rixsprodata_roi2.pkl", "rb") as f:
             rixsprodata = pickle.load(f)
-        herfd_on=rixsprodata.RIXS_map_pumped[:,167]
-        herfd_off=rixsprodata.RIXS_map_unpumped[:,167]
-        herfd_diff=np.subtract(rixsprodata.RIXS_map_pumped[:,167], rixsprodata.RIXS_map_unpumped[:,167])
+        # herfd_on=rixsprodata.RIXS_map_pumped[:,167]
+        # herfd_off=rixsprodata.RIXS_map_unpumped[:,167]
+        # herfd_diff=np.subtract(rixsprodata.RIXS_map_pumped[:,167], rixsprodata.RIXS_map_unpumped[:,167])
         index = []
+        xes_on.append(np.sum(rixsprodata.XES_on_2d_array,0))
+        xes_off.append(np.sum(rixsprodata.XES_off_2d_array,0))
         for elements in range(0, len(xasrawdata.Energy)):
             Element = min(ReferenceEnergy, key=lambda var: abs(var - xasrawdata.Energy[elements]))
             index.append(ReferenceEnergy.index(Element))
 
-        w, h = 300,55
+        w, h = 150,55
         RIXSonTot.append([[0 for x in range(w)] for y in range(h)])
         RIXSoffTot.append([[0 for x in range(w)] for y in range(h)])
         herfd_pumped.append([0]*55)
@@ -49,27 +53,27 @@ def plotRIXS(scans, base, dirxas, dirrixs, ploton):
             addVals = index[variable]
             RIXSonTot[i][addVals] = rixsprodata.RIXS_map_pumped[variable]
             RIXSoffTot[i][addVals] = rixsprodata.RIXS_map_unpumped[variable]
-            herfd_pumped[i][addVals]=herfd_on[variable]
-            herfd_unpumped[i][addVals]=herfd_off[variable]
-        plt.plot(herfd_unpumped[i])
+            # herfd_pumped[i][addVals]=herfd_on[variable]
+            # herfd_unpumped[i][addVals]=herfd_off[variable]
+        # plt.plot(herfd_unpumped[i])
     RIXSon = np.asarray(RIXSonTot)
     RIXSoff = np.asarray(RIXSoffTot)
-    herfd_pumped = np.asarray(herfd_pumped)
-    herfd_unpumped = np.asarray(herfd_unpumped)
+    # herfd_pumped = np.asarray(herfd_pumped)
+    # herfd_unpumped = np.asarray(herfd_unpumped)
     RIXSon[RIXSon == 0] = np.nan
     RIXSoff[RIXSoff == 0] = np.nan
-    herfd_pumped[herfd_pumped == 0] = np.nan
-    herfd_unpumped[herfd_unpumped == 0] = np.nan
+    # herfd_pumped[herfd_pumped == 0] = np.nan
+    # herfd_unpumped[herfd_unpumped == 0] = np.nan
 
 
     RIXSonAVG = np.nanmean(RIXSon, axis=0)
     RIXSoffAVG = np.nanmean(RIXSoff, axis=0)
-    herfd_pumped = np.nanmean(herfd_pumped,axis = 0)
-    herfd_unpumped = np.nanmean(herfd_unpumped,axis = 0)
+    # herfd_pumped = np.nanmean(herfd_pumped,axis = 0)
+    # herfd_unpumped = np.nanmean(herfd_unpumped,axis = 0)
     RIXSonAVG = np.nan_to_num(RIXSonAVG)
     RIXSoffAVG = np.nan_to_num(RIXSoffAVG)
-    herfd_pumped = np.nan_to_num(herfd_pumped)
-    herfd_unpumped = np.nan_to_num(herfd_unpumped)
+    # herfd_pumped = np.nan_to_num(herfd_pumped)
+    # herfd_unpumped = np.nan_to_num(herfd_unpumped)
 
     if ploton is True:
         X, Y = np.meshgrid(np.linspace(0, RIXSonAVG.shape[1], RIXSonAVG.shape[1] + 1), xasrawdata.Energy)
@@ -101,4 +105,4 @@ def plotRIXS(scans, base, dirxas, dirrixs, ploton):
         plt.title('DimerACN RIXS pumped-unpumped 10ps')
         plt.tight_layout()
 
-    return RIXSonAVG, RIXSoffAVG, xasrawdata, herfd_pumped, herfd_unpumped,herfd_Difference
+    return RIXSonAVG, RIXSoffAVG, xasrawdata,xes_on,xes_off#, herfd_pumped, herfd_unpumped,herfd_Difference
