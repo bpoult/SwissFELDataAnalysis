@@ -10,12 +10,9 @@ import ProcessedDataClass as PDC
 def plotRIXS(scans, base, dirxas, dirrixs, ploton):
     RIXSonTot = []
     RIXSoffTot = []
-    herfd_pumped = []
-    herfd_unpumped = []
-    herfd_diff = []
-    herfd_on = []
-    herfd_off = []
-    herfd_Difference = []
+    RIXSon_err_tot = []
+    RIXSoff_err_tot = []
+
     ReferenceEnergy = [2852.0, 2851.0, 2850.0, 2849.0, 2848.0, 2847.0, 2846.5, 2846.0, 2845.5, 2845.0, 2844.75, 2844.5,
                        2844.25, 2844.0,
                        2843.75, 2843.5, 2843.25, 2843.0, 2842.75, 2842.5, 2842.25, 2842.0, 2841.75, 2841.5, 2841.25,
@@ -25,7 +22,6 @@ def plotRIXS(scans, base, dirxas, dirrixs, ploton):
                        2836.75, 2836.5, 2836.25, 2836.0, 2835.75, 2835.5, 2835.25, 2835.0, 2834.5, 2834.0, 2833.0,
                        2832.0, 2831.0]
     Energy = ReferenceEnergy
-    # plt.figure()
     xes_on = []
     xes_off = []
     for i in range(0, len(scans)):
@@ -34,9 +30,6 @@ def plotRIXS(scans, base, dirxas, dirrixs, ploton):
             xasrawdata = pickle.load(f)
         with open(dirrixs + basename + "rixsprodata_roi2.pkl", "rb") as f:
             rixsprodata = pickle.load(f)
-        # herfd_on=rixsprodata.RIXS_map_pumped[:,167]
-        # herfd_off=rixsprodata.RIXS_map_unpumped[:,167]
-        # herfd_diff=np.subtract(rixsprodata.RIXS_map_pumped[:,167], rixsprodata.RIXS_map_unpumped[:,167])
         index = []
         xes_on.append(np.sum(rixsprodata.XES_on_2d_array,0))
         xes_off.append(np.sum(rixsprodata.XES_off_2d_array,0))
@@ -47,33 +40,37 @@ def plotRIXS(scans, base, dirxas, dirrixs, ploton):
         w, h = 150,55
         RIXSonTot.append([[0 for x in range(w)] for y in range(h)])
         RIXSoffTot.append([[0 for x in range(w)] for y in range(h)])
-        herfd_pumped.append([0]*55)
-        herfd_unpumped.append([0]*55)
+        RIXSon_err_tot.append([[0 for x in range(w)] for y in range(h)])
+        RIXSoff_err_tot.append([[0 for x in range(w)] for y in range(h)])
+
         for variable in range(0, len(index)):
             addVals = index[variable]
             RIXSonTot[i][addVals] = rixsprodata.RIXS_map_pumped[variable]
             RIXSoffTot[i][addVals] = rixsprodata.RIXS_map_unpumped[variable]
-            # herfd_pumped[i][addVals]=herfd_on[variable]
-            # herfd_unpumped[i][addVals]=herfd_off[variable]
-        # plt.plot(herfd_unpumped[i])
+            RIXSon_err_tot[i][addVals] = rixsprodata.RIXS_map_pumped_err[variable]
+            RIXSoff_err_tot[i][addVals] = rixsprodata.RIXS_map_unpumped_err[variable]
+
     RIXSon = np.asarray(RIXSonTot)
     RIXSoff = np.asarray(RIXSoffTot)
-    # herfd_pumped = np.asarray(herfd_pumped)
-    # herfd_unpumped = np.asarray(herfd_unpumped)
+    RIXSon_err = np.asarray(RIXSon_err_tot)
+    RIXSoff_err = np.asarray(RIXSoff_err_tot)
+
+
     RIXSon[RIXSon == 0] = np.nan
     RIXSoff[RIXSoff == 0] = np.nan
-    # herfd_pumped[herfd_pumped == 0] = np.nan
-    # herfd_unpumped[herfd_unpumped == 0] = np.nan
+    RIXSon_err[RIXSon_err == 0] = np.nan
+    RIXSoff_err[RIXSoff_err == 0] = np.nan
 
 
     RIXSonAVG = np.nanmean(RIXSon, axis=0)
     RIXSoffAVG = np.nanmean(RIXSoff, axis=0)
-    # herfd_pumped = np.nanmean(herfd_pumped,axis = 0)
-    # herfd_unpumped = np.nanmean(herfd_unpumped,axis = 0)
+    RIXSon_err_avg = np.nanmean(RIXSon_err,axis=0)
+    RIXSoff_err_avg = np.nanmean(RIXSoff_err,axis=0)
+
     RIXSonAVG = np.nan_to_num(RIXSonAVG)
     RIXSoffAVG = np.nan_to_num(RIXSoffAVG)
-    # herfd_pumped = np.nan_to_num(herfd_pumped)
-    # herfd_unpumped = np.nan_to_num(herfd_unpumped)
+    RIXSon_err_avg = np.nan_to_num(RIXSon_err_avg)
+    RIXSoff_err_avg = np.nan_to_num(RIXSoff_err_avg)
 
     if ploton is True:
         X, Y = np.meshgrid(np.linspace(0, RIXSonAVG.shape[1], RIXSonAVG.shape[1] + 1), xasrawdata.Energy)
@@ -105,4 +102,4 @@ def plotRIXS(scans, base, dirxas, dirrixs, ploton):
         plt.title('DimerACN RIXS pumped-unpumped 10ps')
         plt.tight_layout()
 
-    return RIXSonAVG, RIXSoffAVG, xasrawdata,xes_on,xes_off#, herfd_pumped, herfd_unpumped,herfd_Difference
+    return RIXSonAVG, RIXSoffAVG,RIXSon_err_avg,RIXSoff_err_avg,RIXSon,RIXSoff,RIXSon_err,RIXSoff_err, xasrawdata,xes_on,xes_off
